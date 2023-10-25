@@ -1,0 +1,1111 @@
+GAS LISTING /tmp/ccWubpT6.s 			page 1
+
+
+   1              		.file	"mem.c"
+   2              		.option nopic
+   3              		.option norelax
+   4              		.text
+   5              	.Ltext0:
+   6              		.cfi_sections	.debug_frame
+   7              		.align	2
+   8              		.globl	initmem
+  10              	initmem:
+  11              	.LFB0:
+  12              		.file 1 "src/mem.c"
+   1:src/mem.c     **** #include "../h/kernel.h"
+   2:src/mem.c     **** 
+   3:src/mem.c     **** 
+   4:src/mem.c     **** uint8 *bitmap;
+   5:src/mem.c     **** void *heapstart;
+   6:src/mem.c     **** size_t heapsz;
+   7:src/mem.c     **** uintptr hstart;
+   8:src/mem.c     **** uintptr hend;
+   9:src/mem.c     **** 
+  10:src/mem.c     **** spinlock memlock = INITLOCK;
+  11:src/mem.c     **** 
+  12:src/mem.c     **** #define ROUNDUP(x, n) ((x) % (n) ? ((x) / (n) + 1) * (n) : (x))
+  13:src/mem.c     **** #define ROUNDDOWN(x, n) ((x) % (n) ? ((x) / (n)) * (n) : (x))
+  14:src/mem.c     **** 
+  15:src/mem.c     **** extern void printaddr(uintptr a);
+  16:src/mem.c     **** 
+  17:src/mem.c     **** 
+  18:src/mem.c     **** void initmem() {
+  13              		.loc 1 18 16
+  14              		.cfi_startproc
+  15 0000 130101FF 		addi	sp,sp,-16
+  16              		.cfi_def_cfa_offset 16
+  17 0004 23341100 		sd	ra,8(sp)
+  18 0008 23308100 		sd	s0,0(sp)
+  19              		.cfi_offset 1, -8
+  20              		.cfi_offset 8, -16
+  21 000c 13040101 		addi	s0,sp,16
+  22              		.cfi_def_cfa 8, 0
+  19:src/mem.c     ****     hstart = ROUNDUP((uintptr)HEAP_START_ADDR, MEM_BLOCK_SIZE);
+  23              		.loc 1 19 5
+  24              		.loc 1 19 14 is_stmt 0
+  25 0010 97070000 		ld	a5,HEAP_START_ADDR
+  25      83B70700 
+  26 0018 13F7F703 		andi	a4,a5,63
+  27 001c 63080700 		beqz	a4,.L2
+  28              		.loc 1 19 14 discriminator 1
+  29 0020 93D76700 		srli	a5,a5,6
+  30 0024 93871700 		addi	a5,a5,1
+  31 0028 93976700 		slli	a5,a5,6
+  32              	.L2:
+  33              		.loc 1 19 12 discriminator 4
+  34 002c 17070000 		sd	a5,hstart,a4
+  34      2330F700 
+  20:src/mem.c     ****     hend = ROUNDDOWN((uintptr)(HEAP_END_ADDR-1), MEM_BLOCK_SIZE);
+  35              		.loc 1 20 5 is_stmt 1 discriminator 4
+  36              		.loc 1 20 12 is_stmt 0 discriminator 4
+GAS LISTING /tmp/ccWubpT6.s 			page 2
+
+
+  37 0034 17070000 		ld	a4,HEAP_END_ADDR
+  37      03370700 
+  38 003c 1307F7FF 		addi	a4,a4,-1
+  39 0040 9376F703 		andi	a3,a4,63
+  40 0044 63840600 		beqz	a3,.L3
+  41              		.loc 1 20 12 discriminator 1
+  42 0048 137707FC 		andi	a4,a4,-64
+  43              	.L3:
+  44              		.loc 1 20 10 discriminator 4
+  45 004c 97060000 		sd	a4,hend,a3
+  45      23B0E600 
+  21:src/mem.c     **** 
+  22:src/mem.c     ****     size_t heapsize = hend - hstart;
+  46              		.loc 1 22 5 is_stmt 1 discriminator 4
+  47              		.loc 1 22 12 is_stmt 0 discriminator 4
+  48 0054 3306F740 		sub	a2,a4,a5
+  49              	.LVL0:
+  23:src/mem.c     ****     size_t blocknum = heapsize / MEM_BLOCK_SIZE;
+  50              		.loc 1 23 5 is_stmt 1 discriminator 4
+  24:src/mem.c     **** 
+  25:src/mem.c     ****     size_t bitmapsz = blocknum / 8;
+  51              		.loc 1 25 5 discriminator 4
+  52              		.loc 1 25 12 is_stmt 0 discriminator 4
+  53 0058 13569600 		srli	a2,a2,9
+  54              	.LVL1:
+  26:src/mem.c     **** 
+  27:src/mem.c     ****     bitmap = (void*)hstart;
+  55              		.loc 1 27 5 is_stmt 1 discriminator 4
+  56              		.loc 1 27 14 is_stmt 0 discriminator 4
+  57 005c 13850700 		mv	a0,a5
+  58              		.loc 1 27 12 discriminator 4
+  59 0060 97060000 		sd	a5,bitmap,a3
+  59      23B0F600 
+  28:src/mem.c     ****     heapstart = (void*)ROUNDUP(hstart + bitmapsz, MEM_BLOCK_SIZE);
+  60              		.loc 1 28 5 is_stmt 1 discriminator 4
+  61              		.loc 1 28 24 is_stmt 0 discriminator 4
+  62 0068 B387C700 		add	a5,a5,a2
+  63              	.LVL2:
+  64 006c 93F6F703 		andi	a3,a5,63
+  65              		.loc 1 28 17 discriminator 4
+  66 0070 63880600 		beqz	a3,.L4
+  67              		.loc 1 28 24 discriminator 1
+  68 0074 93D76700 		srli	a5,a5,6
+  69 0078 93871700 		addi	a5,a5,1
+  70              		.loc 1 28 17 discriminator 1
+  71 007c 93976700 		slli	a5,a5,6
+  72              	.L4:
+  73              		.loc 1 28 15 discriminator 4
+  74 0080 97060000 		sd	a5,heapstart,a3
+  74      23B0F600 
+  29:src/mem.c     ****     heapsz = ((uintptr)heapstart - hend) / MEM_BLOCK_SIZE;
+  75              		.loc 1 29 5 is_stmt 1 discriminator 4
+  76              		.loc 1 29 34 is_stmt 0 discriminator 4
+  77 0088 B387E740 		sub	a5,a5,a4
+  78              		.loc 1 29 42 discriminator 4
+  79 008c 93D76700 		srli	a5,a5,6
+  80              		.loc 1 29 12 discriminator 4
+GAS LISTING /tmp/ccWubpT6.s 			page 3
+
+
+  81 0090 17070000 		sd	a5,heapsz,a4
+  81      2330F700 
+  82              	.LVL3:
+  30:src/mem.c     **** 
+  31:src/mem.c     ****     memset(bitmap, 0, bitmapsz);
+  83              		.loc 1 31 5 is_stmt 1 discriminator 4
+  84 0098 93050000 		li	a1,0
+  85 009c 97000000 		call	memset
+  85      E7800000 
+  86              	.LVL4:
+  32:src/mem.c     **** }
+  87              		.loc 1 32 1 is_stmt 0 discriminator 4
+  88 00a4 83308100 		ld	ra,8(sp)
+  89              		.cfi_restore 1
+  90 00a8 03340100 		ld	s0,0(sp)
+  91              		.cfi_restore 8
+  92              		.cfi_def_cfa 2, 16
+  93 00ac 13010101 		addi	sp,sp,16
+  94              		.cfi_def_cfa_offset 0
+  95 00b0 67800000 		jr	ra
+  96              		.cfi_endproc
+  97              	.LFE0:
+  99              		.align	2
+ 100              		.globl	__mem_alloc
+ 102              	__mem_alloc:
+ 103              	.LFB1:
+  33:src/mem.c     **** 
+  34:src/mem.c     **** extern void putc1(char c);
+  35:src/mem.c     **** 
+  36:src/mem.c     **** void* __mem_alloc(size_t size){
+ 104              		.loc 1 36 31 is_stmt 1
+ 105              		.cfi_startproc
+ 106              	.LVL5:
+ 107 00b4 130101FE 		addi	sp,sp,-32
+ 108              		.cfi_def_cfa_offset 32
+ 109 00b8 233C1100 		sd	ra,24(sp)
+ 110 00bc 23388100 		sd	s0,16(sp)
+ 111 00c0 23349100 		sd	s1,8(sp)
+ 112              		.cfi_offset 1, -8
+ 113              		.cfi_offset 8, -16
+ 114              		.cfi_offset 9, -24
+ 115 00c4 13040102 		addi	s0,sp,32
+ 116              		.cfi_def_cfa 8, 0
+ 117 00c8 93040500 		mv	s1,a0
+  37:src/mem.c     ****     void *ret = NULL;
+ 118              		.loc 1 37 5
+ 119              	.LVL6:
+  38:src/mem.c     **** 
+  39:src/mem.c     ****    slacquire(&memlock);
+ 120              		.loc 1 39 4
+ 121 00cc 17050000 		lla	a0,memlock
+ 121      13050500 
+ 122              	.LVL7:
+ 123 00d4 97000000 		call	slacquire
+ 123      E7800000 
+ 124              	.LVL8:
+  40:src/mem.c     **** 
+GAS LISTING /tmp/ccWubpT6.s 			page 4
+
+
+  41:src/mem.c     ****     size_t numblock = ROUNDUP(size, MEM_BLOCK_SIZE) / MEM_BLOCK_SIZE + 1;
+ 125              		.loc 1 41 5
+ 126              		.loc 1 41 23 is_stmt 0
+ 127 00dc 93F7F403 		andi	a5,s1,63
+ 128              		.loc 1 41 70
+ 129 00e0 63820702 		beqz	a5,.L7
+ 130              		.loc 1 41 23 discriminator 1
+ 131 00e4 93D56400 		srli	a1,s1,6
+ 132 00e8 93851500 		addi	a1,a1,1
+ 133              		.loc 1 41 53 discriminator 1
+ 134 00ec 9307F0FF 		li	a5,-1
+ 135 00f0 93D76700 		srli	a5,a5,6
+ 136 00f4 B3F5F500 		and	a1,a1,a5
+ 137              		.loc 1 41 70 discriminator 1
+ 138 00f8 93851500 		addi	a1,a1,1
+ 139              	.L8:
+ 140              	.LVL9:
+  42:src/mem.c     **** 
+  43:src/mem.c     **** 
+  44:src/mem.c     **** 
+  45:src/mem.c     ****     for (size_t i = 0; i < heapsz; i++) {
+ 141              		.loc 1 45 5 is_stmt 1 discriminator 4
+ 142              	.LBB2:
+ 143              		.loc 1 45 10 discriminator 4
+ 144              		.loc 1 45 17 is_stmt 0 discriminator 4
+ 145 00fc 13060000 		li	a2,0
+ 146              		.loc 1 45 5 discriminator 4
+ 147 0100 6F00400A 		j	.L9
+ 148              	.LVL10:
+ 149              	.L7:
+ 150              	.LBE2:
+  41:src/mem.c     **** 
+ 151              		.loc 1 41 53 discriminator 2
+ 152 0104 93D56400 		srli	a1,s1,6
+  41:src/mem.c     **** 
+ 153              		.loc 1 41 70 discriminator 2
+ 154 0108 93851500 		addi	a1,a1,1
+ 155 010c 6FF01FFF 		j	.L8
+ 156              	.LVL11:
+ 157              	.L20:
+ 158              	.LBB5:
+ 159              	.LBB3:
+  46:src/mem.c     **** 
+  47:src/mem.c     ****         if (bitmap[i/8] & (1<<(i%8)))
+  48:src/mem.c     ****             continue;
+  49:src/mem.c     **** 
+  50:src/mem.c     ****         for (size_t j = 0; j < numblock; j++) {
+  51:src/mem.c     ****             if (bitmap[(i + j) / 8] & (1 << ((i + j) % 8))){
+  52:src/mem.c     **** 
+  53:src/mem.c     ****                 goto petlja;
+  54:src/mem.c     ****             }
+  55:src/mem.c     **** 
+  56:src/mem.c     ****         }
+  57:src/mem.c     ****         for (size_t j = 0; j < numblock; j++)
+ 160              		.loc 1 57 21
+ 161 0110 13070000 		li	a4,0
+ 162              	.LVL12:
+GAS LISTING /tmp/ccWubpT6.s 			page 5
+
+
+ 163              	.L13:
+ 164              		.loc 1 57 28 is_stmt 1 discriminator 1
+ 165              		.loc 1 57 9 is_stmt 0 discriminator 1
+ 166 0114 637EB702 		bgeu	a4,a1,.L18
+  58:src/mem.c     ****             bitmap[(i+j)/8] |= 1<<((i+j)%8);
+ 167              		.loc 1 58 13 is_stmt 1 discriminator 3
+ 168              		.loc 1 58 22 is_stmt 0 discriminator 3
+ 169 0118 B306E600 		add	a3,a2,a4
+ 170              		.loc 1 58 25 discriminator 3
+ 171 011c 93D73600 		srli	a5,a3,3
+ 172              		.loc 1 58 29 discriminator 3
+ 173 0120 97060000 		ld	a3,bitmap
+ 173      83B60600 
+ 174 0128 B386F600 		add	a3,a3,a5
+ 175              		.loc 1 58 38 discriminator 3
+ 176 012c BB070701 		addw	a5,a4,a6
+ 177              		.loc 1 58 41 discriminator 3
+ 178 0130 13F57700 		andi	a0,a5,7
+ 179              		.loc 1 58 33 discriminator 3
+ 180 0134 93071000 		li	a5,1
+ 181 0138 BB97A700 		sllw	a5,a5,a0
+ 182              		.loc 1 58 29 discriminator 3
+ 183 013c 03C50600 		lbu	a0,0(a3)
+ 184 0140 B3E7A700 		or	a5,a5,a0
+ 185 0144 2380F600 		sb	a5,0(a3)
+  57:src/mem.c     ****             bitmap[(i+j)/8] |= 1<<((i+j)%8);
+ 186              		.loc 1 57 42 is_stmt 1 discriminator 3
+  57:src/mem.c     ****             bitmap[(i+j)/8] |= 1<<((i+j)%8);
+ 187              		.loc 1 57 43 is_stmt 0 discriminator 3
+ 188 0148 13071700 		addi	a4,a4,1
+ 189              	.LVL13:
+ 190 014c 6FF09FFC 		j	.L13
+ 191              	.L18:
+ 192              	.LBE3:
+  59:src/mem.c     **** 
+  60:src/mem.c     ****         *(size_t*)((uintptr)heapstart + i*MEM_BLOCK_SIZE) = numblock;
+ 193              		.loc 1 60 9 is_stmt 1
+ 194              		.loc 1 60 42 is_stmt 0
+ 195 0150 93176600 		slli	a5,a2,6
+ 196              		.loc 1 60 20
+ 197 0154 17070000 		lla	a4,heapstart
+ 197      13070700 
+ 198              	.LVL14:
+ 199 015c 83360700 		ld	a3,0(a4)
+ 200              		.loc 1 60 39
+ 201 0160 B387D700 		add	a5,a5,a3
+ 202              		.loc 1 60 59
+ 203 0164 23B0B700 		sd	a1,0(a5)
+  61:src/mem.c     ****         //printaddr((uintptr)numblock);
+  62:src/mem.c     ****         ret = (void*)((uintptr)heapstart + (i + 1)*MEM_BLOCK_SIZE);
+ 204              		.loc 1 62 9 is_stmt 1
+ 205              		.loc 1 62 47 is_stmt 0
+ 206 0168 93041600 		addi	s1,a2,1
+ 207              	.LVL15:
+ 208              		.loc 1 62 51
+ 209 016c 93946400 		slli	s1,s1,6
+ 210              		.loc 1 62 23
+GAS LISTING /tmp/ccWubpT6.s 			page 6
+
+
+ 211 0170 83370700 		ld	a5,0(a4)
+ 212              		.loc 1 62 42
+ 213 0174 B384F400 		add	s1,s1,a5
+ 214              	.LVL16:
+  63:src/mem.c     ****         goto retuwurn;
+ 215              		.loc 1 63 9 is_stmt 1
+ 216              	.L15:
+ 217              	.LBE5:
+  64:src/mem.c     **** 
+  65:src/mem.c     ****         petlja:
+  66:src/mem.c     ****         (void)1;//putc1('?');
+  67:src/mem.c     ****     }
+  68:src/mem.c     **** 
+  69:src/mem.c     ****     retuwurn:
+  70:src/mem.c     ****     slrelease(&memlock);
+ 218              		.loc 1 70 5
+ 219 0178 17050000 		lla	a0,memlock
+ 219      13050500 
+ 220 0180 97000000 		call	slrelease
+ 220      E7800000 
+ 221              	.LVL17:
+  71:src/mem.c     ****     return ret;
+ 222              		.loc 1 71 5
+  72:src/mem.c     **** }
+ 223              		.loc 1 72 1 is_stmt 0
+ 224 0188 13850400 		mv	a0,s1
+ 225 018c 83308101 		ld	ra,24(sp)
+ 226              		.cfi_remember_state
+ 227              		.cfi_restore 1
+ 228 0190 03340101 		ld	s0,16(sp)
+ 229              		.cfi_restore 8
+ 230              		.cfi_def_cfa 2, 32
+ 231 0194 83348100 		ld	s1,8(sp)
+ 232              		.cfi_restore 9
+ 233              	.LVL18:
+ 234 0198 13010102 		addi	sp,sp,32
+ 235              		.cfi_def_cfa_offset 0
+ 236 019c 67800000 		jr	ra
+ 237              	.LVL19:
+ 238              	.L10:
+ 239              		.cfi_restore_state
+ 240              	.LBB6:
+  66:src/mem.c     ****     }
+ 241              		.loc 1 66 9 is_stmt 1 discriminator 2
+  45:src/mem.c     **** 
+ 242              		.loc 1 45 36 discriminator 2
+  45:src/mem.c     **** 
+ 243              		.loc 1 45 37 is_stmt 0 discriminator 2
+ 244 01a0 13061600 		addi	a2,a2,1
+ 245              	.LVL20:
+ 246              	.L9:
+  45:src/mem.c     **** 
+ 247              		.loc 1 45 24 is_stmt 1 discriminator 1
+  45:src/mem.c     **** 
+ 248              		.loc 1 45 26 is_stmt 0 discriminator 1
+ 249 01a4 97070000 		ld	a5,heapsz
+ 249      83B70700 
+GAS LISTING /tmp/ccWubpT6.s 			page 7
+
+
+  45:src/mem.c     **** 
+ 250              		.loc 1 45 5 discriminator 1
+ 251 01ac 6370F606 		bleu	a5,a2,.L19
+  47:src/mem.c     ****             continue;
+ 252              		.loc 1 47 9 is_stmt 1
+  47:src/mem.c     ****             continue;
+ 253              		.loc 1 47 19 is_stmt 0
+ 254 01b0 17050000 		ld	a0,bitmap
+ 254      03350500 
+  47:src/mem.c     ****             continue;
+ 255              		.loc 1 47 21
+ 256 01b8 93573600 		srli	a5,a2,3
+  47:src/mem.c     ****             continue;
+ 257              		.loc 1 47 19
+ 258 01bc B307F500 		add	a5,a0,a5
+ 259 01c0 83C70700 		lbu	a5,0(a5)
+  47:src/mem.c     ****             continue;
+ 260              		.loc 1 47 33
+ 261 01c4 1B080600 		sext.w	a6,a2
+ 262 01c8 13777600 		andi	a4,a2,7
+  47:src/mem.c     ****             continue;
+ 263              		.loc 1 47 13
+ 264 01cc BBD7E740 		sraw	a5,a5,a4
+ 265 01d0 93F71700 		andi	a5,a5,1
+  47:src/mem.c     ****             continue;
+ 266              		.loc 1 47 12
+ 267 01d4 E39607FC 		bnez	a5,.L10
+ 268              	.LBB4:
+  50:src/mem.c     ****             if (bitmap[(i + j) / 8] & (1 << ((i + j) % 8))){
+ 269              		.loc 1 50 21
+ 270 01d8 13070000 		li	a4,0
+ 271              	.L11:
+ 272              	.LVL21:
+  50:src/mem.c     ****             if (bitmap[(i + j) / 8] & (1 << ((i + j) % 8))){
+ 273              		.loc 1 50 28 is_stmt 1 discriminator 1
+  50:src/mem.c     ****             if (bitmap[(i + j) / 8] & (1 << ((i + j) % 8))){
+ 274              		.loc 1 50 9 is_stmt 0 discriminator 1
+ 275 01dc E37AB7F2 		bgeu	a4,a1,.L20
+  51:src/mem.c     **** 
+ 276              		.loc 1 51 13 is_stmt 1
+  51:src/mem.c     **** 
+ 277              		.loc 1 51 27 is_stmt 0
+ 278 01e0 B307E600 		add	a5,a2,a4
+  51:src/mem.c     **** 
+ 279              		.loc 1 51 32
+ 280 01e4 93D73700 		srli	a5,a5,3
+  51:src/mem.c     **** 
+ 281              		.loc 1 51 23
+ 282 01e8 B307F500 		add	a5,a0,a5
+ 283 01ec 83C70700 		lbu	a5,0(a5)
+  51:src/mem.c     **** 
+ 284              		.loc 1 51 49
+ 285 01f0 BB060701 		addw	a3,a4,a6
+  51:src/mem.c     **** 
+ 286              		.loc 1 51 54
+ 287 01f4 93F67600 		andi	a3,a3,7
+  51:src/mem.c     **** 
+GAS LISTING /tmp/ccWubpT6.s 			page 8
+
+
+ 288              		.loc 1 51 17
+ 289 01f8 BBD7D740 		sraw	a5,a5,a3
+ 290 01fc 93F71700 		andi	a5,a5,1
+  51:src/mem.c     **** 
+ 291              		.loc 1 51 16
+ 292 0200 E39007FA 		bnez	a5,.L10
+  50:src/mem.c     ****             if (bitmap[(i + j) / 8] & (1 << ((i + j) % 8))){
+ 293              		.loc 1 50 42 is_stmt 1 discriminator 2
+  50:src/mem.c     ****             if (bitmap[(i + j) / 8] & (1 << ((i + j) % 8))){
+ 294              		.loc 1 50 43 is_stmt 0 discriminator 2
+ 295 0204 13071700 		addi	a4,a4,1
+ 296              	.LVL22:
+ 297 0208 6FF05FFD 		j	.L11
+ 298              	.LVL23:
+ 299              	.L19:
+ 300              	.LBE4:
+ 301              	.LBE6:
+  37:src/mem.c     **** 
+ 302              		.loc 1 37 11
+ 303 020c 93040000 		li	s1,0
+ 304              	.LVL24:
+ 305 0210 6FF09FF6 		j	.L15
+ 306              		.cfi_endproc
+ 307              	.LFE1:
+ 309              		.align	2
+ 310              		.globl	__mem_free
+ 312              	__mem_free:
+ 313              	.LFB2:
+  73:src/mem.c     **** int __mem_free(void *p){
+ 314              		.loc 1 73 24 is_stmt 1
+ 315              		.cfi_startproc
+ 316              	.LVL25:
+ 317 0214 130101FE 		addi	sp,sp,-32
+ 318              		.cfi_def_cfa_offset 32
+ 319 0218 233C1100 		sd	ra,24(sp)
+ 320 021c 23388100 		sd	s0,16(sp)
+ 321 0220 23349100 		sd	s1,8(sp)
+ 322              		.cfi_offset 1, -8
+ 323              		.cfi_offset 8, -16
+ 324              		.cfi_offset 9, -24
+ 325 0224 13040102 		addi	s0,sp,32
+ 326              		.cfi_def_cfa 8, 0
+ 327 0228 93040500 		mv	s1,a0
+  74:src/mem.c     ****     slacquire(&memlock);
+ 328              		.loc 1 74 5
+ 329 022c 17050000 		lla	a0,memlock
+ 329      13050500 
+ 330              	.LVL26:
+ 331 0234 97000000 		call	slacquire
+ 331      E7800000 
+ 332              	.LVL27:
+  75:src/mem.c     ****     // ret = (void*)((uintptr)heapstart + i*MEM_BLOCK_SIZE + 1);
+  76:src/mem.c     ****     size_t ind = ((uintptr)p - (uintptr)heapstart) / MEM_BLOCK_SIZE - 1;
+ 333              		.loc 1 76 5
+ 334              		.loc 1 76 32 is_stmt 0
+ 335 023c 17080000 		ld	a6,heapstart
+ 335      03380800 
+GAS LISTING /tmp/ccWubpT6.s 			page 9
+
+
+ 336              		.loc 1 76 30
+ 337 0244 33880441 		sub	a6,s1,a6
+ 338              		.loc 1 76 52
+ 339 0248 13586800 		srli	a6,a6,6
+ 340              		.loc 1 76 12
+ 341 024c 1308F8FF 		addi	a6,a6,-1
+ 342              	.LVL28:
+  77:src/mem.c     ****     size_t numblock = *(size_t *)((uintptr)p - MEM_BLOCK_SIZE);
+ 343              		.loc 1 77 5 is_stmt 1
+ 344              		.loc 1 77 12 is_stmt 0
+ 345 0250 83B804FC 		ld	a7,-64(s1)
+ 346              	.LVL29:
+  78:src/mem.c     ****     size_t i = ind;
+ 347              		.loc 1 78 5 is_stmt 1
+  79:src/mem.c     ****     for (; i < ind + numblock; i++) {
+ 348              		.loc 1 79 5
+  78:src/mem.c     ****     size_t i = ind;
+ 349              		.loc 1 78 12 is_stmt 0
+ 350 0254 13070800 		mv	a4,a6
+ 351              	.LVL30:
+ 352              	.L22:
+ 353              		.loc 1 79 12 is_stmt 1 discriminator 1
+ 354              		.loc 1 79 20 is_stmt 0 discriminator 1
+ 355 0258 B3071801 		add	a5,a6,a7
+ 356              		.loc 1 79 5 discriminator 1
+ 357 025c 6372F704 		bleu	a5,a4,.L27
+  80:src/mem.c     ****         if (((bitmap[i / 8] >> (i % 8)) & 1) == 0) return -1;
+ 358              		.loc 1 80 9 is_stmt 1
+ 359              		.loc 1 80 24 is_stmt 0
+ 360 0260 93563700 		srli	a3,a4,3
+ 361              		.loc 1 80 21
+ 362 0264 97070000 		ld	a5,bitmap
+ 362      83B70700 
+ 363 026c B386D700 		add	a3,a5,a3
+ 364 0270 83C50600 		lbu	a1,0(a3)
+ 365              		.loc 1 80 35
+ 366 0274 13757700 		andi	a0,a4,7
+ 367              		.loc 1 80 29
+ 368 0278 3BD6A540 		sraw	a2,a1,a0
+ 369              		.loc 1 80 41
+ 370 027c 13761600 		andi	a2,a2,1
+ 371              		.loc 1 80 12
+ 372 0280 63040604 		beqz	a2,.L25
+  81:src/mem.c     ****         bitmap[i / 8] &= ~(1 << (i % 8));
+ 373              		.loc 1 81 9 is_stmt 1
+ 374              		.loc 1 81 30 is_stmt 0
+ 375 0284 93071000 		li	a5,1
+ 376 0288 BB97A700 		sllw	a5,a5,a0
+ 377              		.loc 1 81 23
+ 378 028c 93C7F7FF 		not	a5,a5
+ 379 0290 B3F7B700 		and	a5,a5,a1
+ 380 0294 2380F600 		sb	a5,0(a3)
+  79:src/mem.c     ****     for (; i < ind + numblock; i++) {
+ 381              		.loc 1 79 32 is_stmt 1
+  79:src/mem.c     ****     for (; i < ind + numblock; i++) {
+ 382              		.loc 1 79 33 is_stmt 0
+ 383 0298 13071700 		addi	a4,a4,1
+GAS LISTING /tmp/ccWubpT6.s 			page 10
+
+
+ 384              	.LVL31:
+ 385 029c 6FF0DFFB 		j	.L22
+ 386              	.L27:
+  82:src/mem.c     ****     }
+  83:src/mem.c     ****     slrelease(&memlock);
+ 387              		.loc 1 83 5 is_stmt 1
+ 388 02a0 17050000 		lla	a0,memlock
+ 388      13050500 
+ 389 02a8 97000000 		call	slrelease
+ 389      E7800000 
+ 390              	.LVL32:
+  84:src/mem.c     ****     return 0;
+ 391              		.loc 1 84 5
+ 392              		.loc 1 84 12 is_stmt 0
+ 393 02b0 13050000 		li	a0,0
+ 394              	.L23:
+  85:src/mem.c     **** }
+ 395              		.loc 1 85 1
+ 396 02b4 83308101 		ld	ra,24(sp)
+ 397              		.cfi_remember_state
+ 398              		.cfi_restore 1
+ 399 02b8 03340101 		ld	s0,16(sp)
+ 400              		.cfi_restore 8
+ 401              		.cfi_def_cfa 2, 32
+ 402 02bc 83348100 		ld	s1,8(sp)
+ 403              		.cfi_restore 9
+ 404              	.LVL33:
+ 405 02c0 13010102 		addi	sp,sp,32
+ 406              		.cfi_def_cfa_offset 0
+ 407 02c4 67800000 		jr	ra
+ 408              	.LVL34:
+ 409              	.L25:
+ 410              		.cfi_restore_state
+  80:src/mem.c     ****         bitmap[i / 8] &= ~(1 << (i % 8));
+ 411              		.loc 1 80 59
+ 412 02c8 1305F0FF 		li	a0,-1
+ 413 02cc 6FF09FFE 		j	.L23
+ 414              		.cfi_endproc
+ 415              	.LFE2:
+ 417              		.align	2
+ 418              		.globl	mem_alloc
+ 420              	mem_alloc:
+ 421              	.LFB3:
+  86:src/mem.c     **** void *mem_alloc(size_t size) {
+ 422              		.loc 1 86 30 is_stmt 1
+ 423              		.cfi_startproc
+ 424              	.LVL35:
+ 425 02d0 130101FF 		addi	sp,sp,-16
+ 426              		.cfi_def_cfa_offset 16
+ 427 02d4 23348100 		sd	s0,8(sp)
+ 428              		.cfi_offset 8, -8
+ 429 02d8 13040101 		addi	s0,sp,16
+ 430              		.cfi_def_cfa 8, 0
+ 431 02dc 93070500 		mv	a5,a0
+  87:src/mem.c     ****     void *ret;
+ 432              		.loc 1 87 5
+  88:src/mem.c     **** 
+GAS LISTING /tmp/ccWubpT6.s 			page 11
+
+
+  89:src/mem.c     ****     asm volatile ("li a0, 1\n" // Broj poziva
+ 433              		.loc 1 89 5
+ 434              	#APP
+ 435              	# 89 "src/mem.c" 1
+  90 02e4 93850700 	                  "\tmv a1, %1\n"
+  91 02e8 73000000 	                  "\tecall\n"
+  92 02ec 93070500 	                  "\tmv %0, a0\n" // Povratna vrednost
+  93              	            : "=r" (ret)
+  94              	            : "r" (size)
+ 436              		li a0, 1
+ 437              		mv a1, a5
+ 438              		ecall
+ 439              		mv a5, a0
+ 440              	
+ 441              	# 0 "" 2
+ 442              	.LVL36:
+  95:src/mem.c     ****             : "a0", "a1");
+  96:src/mem.c     **** 
+  97:src/mem.c     ****     return ret;
+ 443              		.loc 1 97 5
+  98:src/mem.c     **** }
+ 444              		.loc 1 98 1 is_stmt 0
+ 445              	#NO_APP
+ 446 02f0 13850700 		mv	a0,a5
+ 447 02f4 03348100 		ld	s0,8(sp)
+ 448              		.cfi_restore 8
+ 449              		.cfi_def_cfa 2, 16
+ 450 02f8 13010101 		addi	sp,sp,16
+ 451              		.cfi_def_cfa_offset 0
+ 452 02fc 67800000 		jr	ra
+ 453              		.cfi_endproc
+ 454              	.LFE3:
+ 456              		.align	2
+ 457              		.globl	mem_free
+ 459              	mem_free:
+ 460              	.LFB4:
+  99:src/mem.c     **** int mem_free(void* p) {
+ 461              		.loc 1 99 23 is_stmt 1
+ 462              		.cfi_startproc
+ 463              	.LVL37:
+ 464 0300 130101FF 		addi	sp,sp,-16
+ 465              		.cfi_def_cfa_offset 16
+ 466 0304 23348100 		sd	s0,8(sp)
+ 467              		.cfi_offset 8, -8
+ 468 0308 13040101 		addi	s0,sp,16
+ 469              		.cfi_def_cfa 8, 0
+ 470 030c 93070500 		mv	a5,a0
+ 100:src/mem.c     ****     void *ret;
+ 471              		.loc 1 100 5
+ 101:src/mem.c     **** 
+ 102:src/mem.c     ****     asm volatile ("li a0, 2\n" // Broj poziva
+ 472              		.loc 1 102 5
+ 473              	#APP
+ 474              	# 102 "src/mem.c" 1
+ 103 0314 93850700 	                  "\tmv a1, %1\n"
+ 104 0318 73000000 	                  "\tecall\n"
+ 105 031c 93070500 	                  "\tmv %0, a0\n" // Povratna vrednost
+GAS LISTING /tmp/ccWubpT6.s 			page 12
+
+
+ 106              	            : "=r" (ret)
+ 107              	            : "r" (p)
+ 475              		li a0, 2
+ 476              		mv a1, a5
+ 477              		ecall
+ 478              		mv a5, a0
+ 479              	
+ 480              	# 0 "" 2
+ 481              	.LVL38:
+ 108:src/mem.c     ****             : "a0", "a1");
+ 109:src/mem.c     **** 
+ 110:src/mem.c     ****     return (uint64)ret;
+ 482              		.loc 1 110 5
+ 111:src/mem.c     **** }
+ 483              		.loc 1 111 1 is_stmt 0
+ 484              	#NO_APP
+ 485 0320 1B850700 		sext.w	a0,a5
+ 486 0324 03348100 		ld	s0,8(sp)
+ 487              		.cfi_restore 8
+ 488              		.cfi_def_cfa 2, 16
+ 489 0328 13010101 		addi	sp,sp,16
+ 490              		.cfi_def_cfa_offset 0
+ 491 032c 67800000 		jr	ra
+ 492              		.cfi_endproc
+ 493              	.LFE4:
+ 495              		.globl	memlock
+ 496              		.globl	hend
+ 497              		.globl	hstart
+ 498              		.globl	heapsz
+ 499              		.globl	heapstart
+ 500              		.globl	bitmap
+ 501              		.section	.sbss,"aw",@nobits
+ 502              		.align	3
+ 505              	memlock:
+ 506 0000 00000000 		.zero	4
+ 507 0004 00000000 		.zero	4
+ 510              	hend:
+ 511 0008 00000000 		.zero	8
+ 511      00000000 
+ 514              	hstart:
+ 515 0010 00000000 		.zero	8
+ 515      00000000 
+ 518              	heapsz:
+ 519 0018 00000000 		.zero	8
+ 519      00000000 
+ 522              	heapstart:
+ 523 0020 00000000 		.zero	8
+ 523      00000000 
+ 526              	bitmap:
+ 527 0028 00000000 		.zero	8
+ 527      00000000 
+ 528              		.text
+ 529              	.Letext0:
+ 530              		.file 2 "src/../h/../lib/hw.h"
+ 531              		.file 3 "src/../h/kernel.h"
+GAS LISTING /tmp/ccWubpT6.s 			page 13
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 mem.c
+     /tmp/ccWubpT6.s:10     .text:0000000000000000 initmem
+     /tmp/ccWubpT6.s:14     .text:0000000000000000 .L0 
+     /tmp/ccWubpT6.s:15     .text:0000000000000000 .L0 
+     /tmp/ccWubpT6.s:16     .text:0000000000000004 .L0 
+     /tmp/ccWubpT6.s:19     .text:000000000000000c .L0 
+     /tmp/ccWubpT6.s:20     .text:000000000000000c .L0 
+     /tmp/ccWubpT6.s:22     .text:0000000000000010 .L0 
+     /tmp/ccWubpT6.s:24     .text:0000000000000010 .L0 
+     /tmp/ccWubpT6.s:25     .text:0000000000000010 .L0 
+     /tmp/ccWubpT6.s:29     .text:0000000000000020 .L0 
+     /tmp/ccWubpT6.s:514    .sbss:0000000000000010 hstart
+     /tmp/ccWubpT6.s:34     .text:000000000000002c .L0 
+     /tmp/ccWubpT6.s:36     .text:0000000000000034 .L0 
+     /tmp/ccWubpT6.s:37     .text:0000000000000034 .L0 
+     /tmp/ccWubpT6.s:42     .text:0000000000000048 .L0 
+     /tmp/ccWubpT6.s:510    .sbss:0000000000000008 hend
+     /tmp/ccWubpT6.s:45     .text:000000000000004c .L0 
+     /tmp/ccWubpT6.s:47     .text:0000000000000054 .L0 
+     /tmp/ccWubpT6.s:48     .text:0000000000000054 .L0 
+     /tmp/ccWubpT6.s:51     .text:0000000000000058 .L0 
+     /tmp/ccWubpT6.s:52     .text:0000000000000058 .L0 
+     /tmp/ccWubpT6.s:53     .text:0000000000000058 .L0 
+     /tmp/ccWubpT6.s:56     .text:000000000000005c .L0 
+     /tmp/ccWubpT6.s:57     .text:000000000000005c .L0 
+     /tmp/ccWubpT6.s:526    .sbss:0000000000000028 bitmap
+     /tmp/ccWubpT6.s:59     .text:0000000000000060 .L0 
+     /tmp/ccWubpT6.s:61     .text:0000000000000068 .L0 
+     /tmp/ccWubpT6.s:62     .text:0000000000000068 .L0 
+     /tmp/ccWubpT6.s:66     .text:0000000000000070 .L0 
+     /tmp/ccWubpT6.s:68     .text:0000000000000074 .L0 
+     /tmp/ccWubpT6.s:71     .text:000000000000007c .L0 
+     /tmp/ccWubpT6.s:522    .sbss:0000000000000020 heapstart
+     /tmp/ccWubpT6.s:74     .text:0000000000000080 .L0 
+     /tmp/ccWubpT6.s:76     .text:0000000000000088 .L0 
+     /tmp/ccWubpT6.s:77     .text:0000000000000088 .L0 
+     /tmp/ccWubpT6.s:79     .text:000000000000008c .L0 
+     /tmp/ccWubpT6.s:518    .sbss:0000000000000018 heapsz
+     /tmp/ccWubpT6.s:81     .text:0000000000000090 .L0 
+     /tmp/ccWubpT6.s:84     .text:0000000000000098 .L0 
+     /tmp/ccWubpT6.s:88     .text:00000000000000a4 .L0 
+     /tmp/ccWubpT6.s:89     .text:00000000000000a8 .L0 
+     /tmp/ccWubpT6.s:91     .text:00000000000000ac .L0 
+     /tmp/ccWubpT6.s:92     .text:00000000000000ac .L0 
+     /tmp/ccWubpT6.s:94     .text:00000000000000b0 .L0 
+     /tmp/ccWubpT6.s:96     .text:00000000000000b4 .L0 
+     /tmp/ccWubpT6.s:102    .text:00000000000000b4 __mem_alloc
+     /tmp/ccWubpT6.s:105    .text:00000000000000b4 .L0 
+     /tmp/ccWubpT6.s:107    .text:00000000000000b4 .L0 
+     /tmp/ccWubpT6.s:108    .text:00000000000000b8 .L0 
+     /tmp/ccWubpT6.s:112    .text:00000000000000c4 .L0 
+     /tmp/ccWubpT6.s:113    .text:00000000000000c4 .L0 
+     /tmp/ccWubpT6.s:114    .text:00000000000000c4 .L0 
+     /tmp/ccWubpT6.s:116    .text:00000000000000c8 .L0 
+     /tmp/ccWubpT6.s:120    .text:00000000000000cc .L0 
+     /tmp/ccWubpT6.s:505    .sbss:0000000000000000 memlock
+GAS LISTING /tmp/ccWubpT6.s 			page 14
+
+
+     /tmp/ccWubpT6.s:121    .text:00000000000000cc .L0 
+     /tmp/ccWubpT6.s:126    .text:00000000000000dc .L0 
+     /tmp/ccWubpT6.s:127    .text:00000000000000dc .L0 
+     /tmp/ccWubpT6.s:129    .text:00000000000000e0 .L0 
+     /tmp/ccWubpT6.s:131    .text:00000000000000e4 .L0 
+     /tmp/ccWubpT6.s:134    .text:00000000000000ec .L0 
+     /tmp/ccWubpT6.s:138    .text:00000000000000f8 .L0 
+     /tmp/ccWubpT6.s:143    .text:00000000000000fc .L0 
+     /tmp/ccWubpT6.s:144    .text:00000000000000fc .L0 
+     /tmp/ccWubpT6.s:145    .text:00000000000000fc .L0 
+     /tmp/ccWubpT6.s:147    .text:0000000000000100 .L0 
+     /tmp/ccWubpT6.s:152    .text:0000000000000104 .L0 
+     /tmp/ccWubpT6.s:154    .text:0000000000000108 .L0 
+     /tmp/ccWubpT6.s:161    .text:0000000000000110 .L0 
+     /tmp/ccWubpT6.s:165    .text:0000000000000114 .L0 
+     /tmp/ccWubpT6.s:166    .text:0000000000000114 .L0 
+     /tmp/ccWubpT6.s:168    .text:0000000000000118 .L0 
+     /tmp/ccWubpT6.s:169    .text:0000000000000118 .L0 
+     /tmp/ccWubpT6.s:171    .text:000000000000011c .L0 
+     /tmp/ccWubpT6.s:173    .text:0000000000000120 .L0 
+     /tmp/ccWubpT6.s:176    .text:000000000000012c .L0 
+     /tmp/ccWubpT6.s:178    .text:0000000000000130 .L0 
+     /tmp/ccWubpT6.s:180    .text:0000000000000134 .L0 
+     /tmp/ccWubpT6.s:183    .text:000000000000013c .L0 
+     /tmp/ccWubpT6.s:187    .text:0000000000000148 .L0 
+     /tmp/ccWubpT6.s:188    .text:0000000000000148 .L0 
+     /tmp/ccWubpT6.s:194    .text:0000000000000150 .L0 
+     /tmp/ccWubpT6.s:195    .text:0000000000000150 .L0 
+     /tmp/ccWubpT6.s:197    .text:0000000000000154 .L0 
+     /tmp/ccWubpT6.s:201    .text:0000000000000160 .L0 
+     /tmp/ccWubpT6.s:203    .text:0000000000000164 .L0 
+     /tmp/ccWubpT6.s:205    .text:0000000000000168 .L0 
+     /tmp/ccWubpT6.s:206    .text:0000000000000168 .L0 
+     /tmp/ccWubpT6.s:209    .text:000000000000016c .L0 
+     /tmp/ccWubpT6.s:211    .text:0000000000000170 .L0 
+     /tmp/ccWubpT6.s:213    .text:0000000000000174 .L0 
+     /tmp/ccWubpT6.s:218    .text:0000000000000178 .L0 
+     /tmp/ccWubpT6.s:219    .text:0000000000000178 .L0 
+     /tmp/ccWubpT6.s:223    .text:0000000000000188 .L0 
+     /tmp/ccWubpT6.s:224    .text:0000000000000188 .L0 
+     /tmp/ccWubpT6.s:226    .text:0000000000000190 .L0 
+     /tmp/ccWubpT6.s:227    .text:0000000000000190 .L0 
+     /tmp/ccWubpT6.s:229    .text:0000000000000194 .L0 
+     /tmp/ccWubpT6.s:230    .text:0000000000000194 .L0 
+     /tmp/ccWubpT6.s:232    .text:0000000000000198 .L0 
+     /tmp/ccWubpT6.s:235    .text:000000000000019c .L0 
+     /tmp/ccWubpT6.s:239    .text:00000000000001a0 .L0 
+     /tmp/ccWubpT6.s:242    .text:00000000000001a0 .L0 
+     /tmp/ccWubpT6.s:243    .text:00000000000001a0 .L0 
+     /tmp/ccWubpT6.s:244    .text:00000000000001a0 .L0 
+     /tmp/ccWubpT6.s:248    .text:00000000000001a4 .L0 
+     /tmp/ccWubpT6.s:249    .text:00000000000001a4 .L0 
+     /tmp/ccWubpT6.s:251    .text:00000000000001ac .L0 
+     /tmp/ccWubpT6.s:253    .text:00000000000001b0 .L0 
+     /tmp/ccWubpT6.s:254    .text:00000000000001b0 .L0 
+     /tmp/ccWubpT6.s:256    .text:00000000000001b8 .L0 
+     /tmp/ccWubpT6.s:258    .text:00000000000001bc .L0 
+GAS LISTING /tmp/ccWubpT6.s 			page 15
+
+
+     /tmp/ccWubpT6.s:261    .text:00000000000001c4 .L0 
+     /tmp/ccWubpT6.s:264    .text:00000000000001cc .L0 
+     /tmp/ccWubpT6.s:267    .text:00000000000001d4 .L0 
+     /tmp/ccWubpT6.s:270    .text:00000000000001d8 .L0 
+     /tmp/ccWubpT6.s:274    .text:00000000000001dc .L0 
+     /tmp/ccWubpT6.s:275    .text:00000000000001dc .L0 
+     /tmp/ccWubpT6.s:277    .text:00000000000001e0 .L0 
+     /tmp/ccWubpT6.s:278    .text:00000000000001e0 .L0 
+     /tmp/ccWubpT6.s:280    .text:00000000000001e4 .L0 
+     /tmp/ccWubpT6.s:282    .text:00000000000001e8 .L0 
+     /tmp/ccWubpT6.s:285    .text:00000000000001f0 .L0 
+     /tmp/ccWubpT6.s:287    .text:00000000000001f4 .L0 
+     /tmp/ccWubpT6.s:289    .text:00000000000001f8 .L0 
+     /tmp/ccWubpT6.s:292    .text:0000000000000200 .L0 
+     /tmp/ccWubpT6.s:294    .text:0000000000000204 .L0 
+     /tmp/ccWubpT6.s:295    .text:0000000000000204 .L0 
+     /tmp/ccWubpT6.s:303    .text:000000000000020c .L0 
+     /tmp/ccWubpT6.s:306    .text:0000000000000214 .L0 
+     /tmp/ccWubpT6.s:312    .text:0000000000000214 __mem_free
+     /tmp/ccWubpT6.s:315    .text:0000000000000214 .L0 
+     /tmp/ccWubpT6.s:317    .text:0000000000000214 .L0 
+     /tmp/ccWubpT6.s:318    .text:0000000000000218 .L0 
+     /tmp/ccWubpT6.s:322    .text:0000000000000224 .L0 
+     /tmp/ccWubpT6.s:323    .text:0000000000000224 .L0 
+     /tmp/ccWubpT6.s:324    .text:0000000000000224 .L0 
+     /tmp/ccWubpT6.s:326    .text:0000000000000228 .L0 
+     /tmp/ccWubpT6.s:329    .text:000000000000022c .L0 
+     /tmp/ccWubpT6.s:334    .text:000000000000023c .L0 
+     /tmp/ccWubpT6.s:335    .text:000000000000023c .L0 
+     /tmp/ccWubpT6.s:337    .text:0000000000000244 .L0 
+     /tmp/ccWubpT6.s:339    .text:0000000000000248 .L0 
+     /tmp/ccWubpT6.s:341    .text:000000000000024c .L0 
+     /tmp/ccWubpT6.s:344    .text:0000000000000250 .L0 
+     /tmp/ccWubpT6.s:345    .text:0000000000000250 .L0 
+     /tmp/ccWubpT6.s:348    .text:0000000000000254 .L0 
+     /tmp/ccWubpT6.s:349    .text:0000000000000254 .L0 
+     /tmp/ccWubpT6.s:350    .text:0000000000000254 .L0 
+     /tmp/ccWubpT6.s:354    .text:0000000000000258 .L0 
+     /tmp/ccWubpT6.s:355    .text:0000000000000258 .L0 
+     /tmp/ccWubpT6.s:357    .text:000000000000025c .L0 
+     /tmp/ccWubpT6.s:359    .text:0000000000000260 .L0 
+     /tmp/ccWubpT6.s:360    .text:0000000000000260 .L0 
+     /tmp/ccWubpT6.s:362    .text:0000000000000264 .L0 
+     /tmp/ccWubpT6.s:366    .text:0000000000000274 .L0 
+     /tmp/ccWubpT6.s:368    .text:0000000000000278 .L0 
+     /tmp/ccWubpT6.s:370    .text:000000000000027c .L0 
+     /tmp/ccWubpT6.s:372    .text:0000000000000280 .L0 
+     /tmp/ccWubpT6.s:374    .text:0000000000000284 .L0 
+     /tmp/ccWubpT6.s:375    .text:0000000000000284 .L0 
+     /tmp/ccWubpT6.s:378    .text:000000000000028c .L0 
+     /tmp/ccWubpT6.s:382    .text:0000000000000298 .L0 
+     /tmp/ccWubpT6.s:383    .text:0000000000000298 .L0 
+     /tmp/ccWubpT6.s:388    .text:00000000000002a0 .L0 
+     /tmp/ccWubpT6.s:392    .text:00000000000002b0 .L0 
+     /tmp/ccWubpT6.s:393    .text:00000000000002b0 .L0 
+     /tmp/ccWubpT6.s:396    .text:00000000000002b4 .L0 
+     /tmp/ccWubpT6.s:397    .text:00000000000002b8 .L0 
+GAS LISTING /tmp/ccWubpT6.s 			page 16
+
+
+     /tmp/ccWubpT6.s:398    .text:00000000000002b8 .L0 
+     /tmp/ccWubpT6.s:400    .text:00000000000002bc .L0 
+     /tmp/ccWubpT6.s:401    .text:00000000000002bc .L0 
+     /tmp/ccWubpT6.s:403    .text:00000000000002c0 .L0 
+     /tmp/ccWubpT6.s:406    .text:00000000000002c4 .L0 
+     /tmp/ccWubpT6.s:410    .text:00000000000002c8 .L0 
+     /tmp/ccWubpT6.s:412    .text:00000000000002c8 .L0 
+     /tmp/ccWubpT6.s:414    .text:00000000000002d0 .L0 
+     /tmp/ccWubpT6.s:420    .text:00000000000002d0 mem_alloc
+     /tmp/ccWubpT6.s:423    .text:00000000000002d0 .L0 
+     /tmp/ccWubpT6.s:425    .text:00000000000002d0 .L0 
+     /tmp/ccWubpT6.s:426    .text:00000000000002d4 .L0 
+     /tmp/ccWubpT6.s:428    .text:00000000000002d8 .L0 
+     /tmp/ccWubpT6.s:430    .text:00000000000002dc .L0 
+     /tmp/ccWubpT6.s:433    .text:00000000000002e0 .L0 
+           src/mem.c:89     .text:00000000000002e0 .L0 
+     /tmp/ccWubpT6.s:444    .text:00000000000002f0 .L0 
+     /tmp/ccWubpT6.s:446    .text:00000000000002f0 .L0 
+     /tmp/ccWubpT6.s:448    .text:00000000000002f8 .L0 
+     /tmp/ccWubpT6.s:449    .text:00000000000002f8 .L0 
+     /tmp/ccWubpT6.s:451    .text:00000000000002fc .L0 
+     /tmp/ccWubpT6.s:453    .text:0000000000000300 .L0 
+     /tmp/ccWubpT6.s:459    .text:0000000000000300 mem_free
+     /tmp/ccWubpT6.s:462    .text:0000000000000300 .L0 
+     /tmp/ccWubpT6.s:464    .text:0000000000000300 .L0 
+     /tmp/ccWubpT6.s:465    .text:0000000000000304 .L0 
+     /tmp/ccWubpT6.s:467    .text:0000000000000308 .L0 
+     /tmp/ccWubpT6.s:469    .text:000000000000030c .L0 
+     /tmp/ccWubpT6.s:472    .text:0000000000000310 .L0 
+           src/mem.c:102    .text:0000000000000310 .L0 
+     /tmp/ccWubpT6.s:483    .text:0000000000000320 .L0 
+     /tmp/ccWubpT6.s:485    .text:0000000000000320 .L0 
+     /tmp/ccWubpT6.s:487    .text:0000000000000328 .L0 
+     /tmp/ccWubpT6.s:488    .text:0000000000000328 .L0 
+     /tmp/ccWubpT6.s:490    .text:000000000000032c .L0 
+     /tmp/ccWubpT6.s:492    .text:0000000000000330 .L0 
+     /tmp/ccWubpT6.s:532    .text:0000000000000330 .L0 
+                     .debug_frame:0000000000000000 .L0 
+     /tmp/ccWubpT6.s:25     .text:0000000000000010 .L0 
+     /tmp/ccWubpT6.s:34     .text:000000000000002c .L0 
+     /tmp/ccWubpT6.s:37     .text:0000000000000034 .L0 
+     /tmp/ccWubpT6.s:45     .text:000000000000004c .L0 
+     /tmp/ccWubpT6.s:59     .text:0000000000000060 .L0 
+     /tmp/ccWubpT6.s:74     .text:0000000000000080 .L0 
+     /tmp/ccWubpT6.s:81     .text:0000000000000090 .L0 
+     /tmp/ccWubpT6.s:121    .text:00000000000000cc .L0 
+     /tmp/ccWubpT6.s:173    .text:0000000000000120 .L0 
+     /tmp/ccWubpT6.s:197    .text:0000000000000154 .L0 
+     /tmp/ccWubpT6.s:219    .text:0000000000000178 .L0 
+     /tmp/ccWubpT6.s:249    .text:00000000000001a4 .L0 
+     /tmp/ccWubpT6.s:254    .text:00000000000001b0 .L0 
+     /tmp/ccWubpT6.s:329    .text:000000000000022c .L0 
+     /tmp/ccWubpT6.s:335    .text:000000000000023c .L0 
+     /tmp/ccWubpT6.s:362    .text:0000000000000264 .L0 
+     /tmp/ccWubpT6.s:388    .text:00000000000002a0 .L0 
+     /tmp/ccWubpT6.s:32     .text:000000000000002c .L2
+     /tmp/ccWubpT6.s:43     .text:000000000000004c .L3
+GAS LISTING /tmp/ccWubpT6.s 			page 17
+
+
+     /tmp/ccWubpT6.s:72     .text:0000000000000080 .L4
+     /tmp/ccWubpT6.s:149    .text:0000000000000104 .L7
+     /tmp/ccWubpT6.s:246    .text:00000000000001a4 .L9
+     /tmp/ccWubpT6.s:139    .text:00000000000000fc .L8
+     /tmp/ccWubpT6.s:191    .text:0000000000000150 .L18
+     /tmp/ccWubpT6.s:163    .text:0000000000000114 .L13
+     /tmp/ccWubpT6.s:299    .text:000000000000020c .L19
+     /tmp/ccWubpT6.s:238    .text:00000000000001a0 .L10
+     /tmp/ccWubpT6.s:157    .text:0000000000000110 .L20
+     /tmp/ccWubpT6.s:271    .text:00000000000001dc .L11
+     /tmp/ccWubpT6.s:216    .text:0000000000000178 .L15
+     /tmp/ccWubpT6.s:386    .text:00000000000002a0 .L27
+     /tmp/ccWubpT6.s:409    .text:00000000000002c8 .L25
+     /tmp/ccWubpT6.s:352    .text:0000000000000258 .L22
+     /tmp/ccWubpT6.s:394    .text:00000000000002b4 .L23
+     /tmp/ccWubpT6.s:1021   .debug_abbrev:0000000000000000 .Ldebug_abbrev0
+     /tmp/ccWubpT6.s:1760   .debug_str:000000000000013b .LASF42
+     /tmp/ccWubpT6.s:1738   .debug_str:000000000000009d .LASF43
+     /tmp/ccWubpT6.s:1758   .debug_str:0000000000000110 .LASF44
+     /tmp/ccWubpT6.s:5      .text:0000000000000000 .Ltext0
+     /tmp/ccWubpT6.s:529    .text:0000000000000330 .Letext0
+     /tmp/ccWubpT6.s:1708   .debug_line:0000000000000000 .Ldebug_line0
+     /tmp/ccWubpT6.s:1756   .debug_str:000000000000010b .LASF3
+     /tmp/ccWubpT6.s:1762   .debug_str:00000000000001d9 .LASF0
+     /tmp/ccWubpT6.s:1748   .debug_str:00000000000000d9 .LASF1
+     /tmp/ccWubpT6.s:1740   .debug_str:00000000000000a7 .LASF2
+     /tmp/ccWubpT6.s:1780   .debug_str:0000000000000248 .LASF4
+     /tmp/ccWubpT6.s:1720   .debug_str:0000000000000038 .LASF5
+     /tmp/ccWubpT6.s:1746   .debug_str:00000000000000c7 .LASF6
+     /tmp/ccWubpT6.s:1714   .debug_str:000000000000001b .LASF7
+     /tmp/ccWubpT6.s:1712   .debug_str:0000000000000008 .LASF8
+     /tmp/ccWubpT6.s:1734   .debug_str:000000000000007b .LASF9
+     /tmp/ccWubpT6.s:1768   .debug_str:00000000000001f6 .LASF10
+     /tmp/ccWubpT6.s:1718   .debug_str:000000000000002a .LASF11
+     /tmp/ccWubpT6.s:1800   .debug_str:00000000000002a3 .LASF12
+     /tmp/ccWubpT6.s:1736   .debug_str:000000000000008e .LASF13
+     /tmp/ccWubpT6.s:1788   .debug_str:0000000000000268 .LASF14
+     /tmp/ccWubpT6.s:1772   .debug_str:000000000000021c .LASF15
+     /tmp/ccWubpT6.s:1750   .debug_str:00000000000000ec .LASF16
+     /tmp/ccWubpT6.s:1728   .debug_str:0000000000000054 .LASF17
+     /tmp/ccWubpT6.s:1770   .debug_str:0000000000000206 .LASF18
+     /tmp/ccWubpT6.s:1716   .debug_str:0000000000000022 .LASF19
+     /tmp/ccWubpT6.s:1784   .debug_str:0000000000000256 .LASF20
+     /tmp/ccWubpT6.s:1726   .debug_str:000000000000004b .LASF21
+     /tmp/ccWubpT6.s:1724   .debug_str:0000000000000044 .LASF22
+     /tmp/ccWubpT6.s:1732   .debug_str:0000000000000071 .LASF23
+     /tmp/ccWubpT6.s:1766   .debug_str:00000000000001ef .LASF24
+     /tmp/ccWubpT6.s:1742   .debug_str:00000000000000b5 .LASF25
+     /tmp/ccWubpT6.s:1722   .debug_str:000000000000003f .LASF26
+     /tmp/ccWubpT6.s:1782   .debug_str:000000000000024e .LASF27
+     /tmp/ccWubpT6.s:1774   .debug_str:000000000000022c .LASF28
+     /tmp/ccWubpT6.s:460    .text:0000000000000300 .LFB4
+     /tmp/ccWubpT6.s:493    .text:0000000000000330 .LFE4
+     /tmp/ccWubpT6.s:1412   .debug_loc:0000000000000000 .LLST14
+     /tmp/ccWubpT6.s:1792   .debug_str:0000000000000281 .LASF29
+     /tmp/ccWubpT6.s:421    .text:00000000000002d0 .LFB3
+     /tmp/ccWubpT6.s:454    .text:0000000000000300 .LFE3
+GAS LISTING /tmp/ccWubpT6.s 			page 18
+
+
+     /tmp/ccWubpT6.s:1798   .debug_str:000000000000029e .LASF30
+     /tmp/ccWubpT6.s:1426   .debug_loc:0000000000000039 .LLST13
+     /tmp/ccWubpT6.s:1744   .debug_str:00000000000000bc .LASF31
+     /tmp/ccWubpT6.s:313    .text:0000000000000214 .LFB2
+     /tmp/ccWubpT6.s:415    .text:00000000000002d0 .LFE2
+     /tmp/ccWubpT6.s:1440   .debug_loc:0000000000000072 .LLST9
+     /tmp/ccWubpT6.s:1462   .debug_loc:00000000000000d1 .LLST10
+     /tmp/ccWubpT6.s:1786   .debug_str:000000000000025f .LASF32
+     /tmp/ccWubpT6.s:1473   .debug_loc:0000000000000107 .LLST11
+     /tmp/ccWubpT6.s:1484   .debug_loc:000000000000013d .LLST12
+     /tmp/ccWubpT6.s:332    .text:000000000000023c .LVL27
+     /tmp/ccWubpT6.s:390    .text:00000000000002b0 .LVL32
+     /tmp/ccWubpT6.s:1796   .debug_str:0000000000000292 .LASF33
+     /tmp/ccWubpT6.s:103    .text:00000000000000b4 .LFB1
+     /tmp/ccWubpT6.s:307    .text:0000000000000214 .LFE1
+     /tmp/ccWubpT6.s:1499   .debug_loc:0000000000000186 .LLST3
+     /tmp/ccWubpT6.s:1528   .debug_loc:00000000000001fb .LLST4
+     /tmp/ccWubpT6.s:1549   .debug_loc:0000000000000259 .LLST5
+     /tmp/ccWubpT6.s:1794   .debug_str:000000000000028b .LASF34
+     /tmp/ccWubpT6.s:1790   .debug_str:0000000000000278 .LASF35
+     /tmp/ccWubpT6.s:1698   .debug_ranges:0000000000000000 .Ldebug_ranges0
+     /tmp/ccWubpT6.s:1564   .debug_loc:00000000000002a2 .LLST6
+     /tmp/ccWubpT6.s:268    .text:00000000000001d8 .LBB4
+     /tmp/ccWubpT6.s:300    .text:000000000000020c .LBE4
+     /tmp/ccWubpT6.s:1580   .debug_loc:00000000000002ec .LLST8
+     /tmp/ccWubpT6.s:159    .text:0000000000000110 .LBB3
+     /tmp/ccWubpT6.s:192    .text:0000000000000150 .LBE3
+     /tmp/ccWubpT6.s:1591   .debug_loc:0000000000000322 .LLST7
+     /tmp/ccWubpT6.s:124    .text:00000000000000dc .LVL8
+     /tmp/ccWubpT6.s:221    .text:0000000000000188 .LVL17
+     /tmp/ccWubpT6.s:1710   .debug_str:0000000000000000 .LASF45
+     /tmp/ccWubpT6.s:11     .text:0000000000000000 .LFB0
+     /tmp/ccWubpT6.s:97     .text:00000000000000b4 .LFE0
+     /tmp/ccWubpT6.s:1776   .debug_str:0000000000000235 .LASF36
+     /tmp/ccWubpT6.s:1598   .debug_loc:0000000000000345 .LLST0
+     /tmp/ccWubpT6.s:1764   .debug_str:00000000000001e6 .LASF37
+     /tmp/ccWubpT6.s:1633   .debug_loc:00000000000003b8 .LLST1
+     /tmp/ccWubpT6.s:1754   .debug_str:0000000000000102 .LASF38
+     /tmp/ccWubpT6.s:1678   .debug_loc:0000000000000435 .LLST2
+     /tmp/ccWubpT6.s:86     .text:00000000000000a4 .LVL4
+     /tmp/ccWubpT6.s:1752   .debug_str:00000000000000f8 .LASF39
+     /tmp/ccWubpT6.s:1778   .debug_str:000000000000023e .LASF40
+     /tmp/ccWubpT6.s:1730   .debug_str:000000000000006a .LASF41
+     /tmp/ccWubpT6.s:463    .text:0000000000000300 .LVL37
+     /tmp/ccWubpT6.s:481    .text:0000000000000320 .LVL38
+     /tmp/ccWubpT6.s:424    .text:00000000000002d0 .LVL35
+     /tmp/ccWubpT6.s:442    .text:00000000000002f0 .LVL36
+     /tmp/ccWubpT6.s:316    .text:0000000000000214 .LVL25
+     /tmp/ccWubpT6.s:330    .text:0000000000000234 .LVL26
+     /tmp/ccWubpT6.s:404    .text:00000000000002c0 .LVL33
+     /tmp/ccWubpT6.s:408    .text:00000000000002c8 .LVL34
+     /tmp/ccWubpT6.s:342    .text:0000000000000250 .LVL28
+     /tmp/ccWubpT6.s:346    .text:0000000000000254 .LVL29
+     /tmp/ccWubpT6.s:351    .text:0000000000000258 .LVL30
+     /tmp/ccWubpT6.s:106    .text:00000000000000b4 .LVL5
+     /tmp/ccWubpT6.s:122    .text:00000000000000d4 .LVL7
+     /tmp/ccWubpT6.s:207    .text:000000000000016c .LVL15
+GAS LISTING /tmp/ccWubpT6.s 			page 19
+
+
+     /tmp/ccWubpT6.s:237    .text:00000000000001a0 .LVL19
+     /tmp/ccWubpT6.s:304    .text:0000000000000210 .LVL24
+     /tmp/ccWubpT6.s:119    .text:00000000000000cc .LVL6
+     /tmp/ccWubpT6.s:214    .text:0000000000000178 .LVL16
+     /tmp/ccWubpT6.s:233    .text:0000000000000198 .LVL18
+     /tmp/ccWubpT6.s:140    .text:00000000000000fc .LVL9
+     /tmp/ccWubpT6.s:148    .text:0000000000000104 .LVL10
+     /tmp/ccWubpT6.s:156    .text:0000000000000110 .LVL11
+     /tmp/ccWubpT6.s:162    .text:0000000000000114 .LVL12
+     /tmp/ccWubpT6.s:272    .text:00000000000001dc .LVL21
+     /tmp/ccWubpT6.s:298    .text:000000000000020c .LVL23
+     /tmp/ccWubpT6.s:198    .text:000000000000015c .LVL14
+     /tmp/ccWubpT6.s:49     .text:0000000000000058 .LVL0
+     /tmp/ccWubpT6.s:54     .text:000000000000005c .LVL1
+     /tmp/ccWubpT6.s:63     .text:000000000000006c .LVL2
+     /tmp/ccWubpT6.s:82     .text:0000000000000098 .LVL3
+     /tmp/ccWubpT6.s:533    .debug_info:0000000000000000 .Ldebug_info0
+     /tmp/ccWubpT6.s:142    .text:00000000000000fc .LBB2
+     /tmp/ccWubpT6.s:150    .text:0000000000000104 .LBE2
+     /tmp/ccWubpT6.s:158    .text:0000000000000110 .LBB5
+     /tmp/ccWubpT6.s:217    .text:0000000000000178 .LBE5
+     /tmp/ccWubpT6.s:240    .text:00000000000001a0 .LBB6
+     /tmp/ccWubpT6.s:301    .text:000000000000020c .LBE6
+
+UNDEFINED SYMBOLS
+HEAP_START_ADDR
+HEAP_END_ADDR
+memset
+slacquire
+slrelease

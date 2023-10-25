@@ -1,0 +1,459 @@
+GAS LISTING /tmp/ccrW4pFQ.s 			page 1
+
+
+   1              		.file	"sem.c"
+   2              		.option nopic
+   3              		.option norelax
+   4              		.text
+   5              	.Ltext0:
+   6              		.cfi_sections	.debug_frame
+   7              		.align	2
+   8              		.globl	sem_close
+  10              	sem_close:
+  11              	.LFB0:
+  12              		.file 1 "src/sem.c"
+   1:src/sem.c     **** //
+   2:src/sem.c     **** // Created by os on 7/28/22.
+   3:src/sem.c     **** //
+   4:src/sem.c     **** #include "../h/syscall_c.h"
+   5:src/sem.c     **** #include "../lib/hw.h"
+   6:src/sem.c     **** int sem_close (sem_t handle){
+  13              		.loc 1 6 29
+  14              		.cfi_startproc
+  15              	.LVL0:
+  16 0000 130101FF 		addi	sp,sp,-16
+  17              		.cfi_def_cfa_offset 16
+  18 0004 23348100 		sd	s0,8(sp)
+  19              		.cfi_offset 8, -8
+  20 0008 13040101 		addi	s0,sp,16
+  21              		.cfi_def_cfa 8, 0
+  22 000c 93070500 		mv	a5,a0
+   7:src/sem.c     ****     int ret;
+  23              		.loc 1 7 5
+   8:src/sem.c     **** 
+   9:src/sem.c     ****     asm volatile ("li a0, 0x22\n" // Broj poziva
+  24              		.loc 1 9 5
+  25              	#APP
+  26              	# 9 "src/sem.c" 1
+  10 0014 93850700 	                  "\tmv a1, %1\n"
+  11 0018 73000000 	                  "\tecall\n"
+  12 001c 93070500 	                  "\tmv %0, a0\n" // Povratna vrednost
+  13              	            : "=r" (ret)
+  14              	            : "r" (handle)
+  27              		li a0, 0x22
+  28              		mv a1, a5
+  29              		ecall
+  30              		mv a5, a0
+  31              	
+  32              	# 0 "" 2
+  33              	.LVL1:
+  15:src/sem.c     ****     , "r" (handle)
+  16:src/sem.c     ****             : "a0", "a1");
+  17:src/sem.c     **** 
+  18:src/sem.c     ****     return ret;
+  34              		.loc 1 18 5
+  19:src/sem.c     **** }
+  35              		.loc 1 19 1 is_stmt 0
+  36              	#NO_APP
+  37 0020 1B850700 		sext.w	a0,a5
+  38 0024 03348100 		ld	s0,8(sp)
+  39              		.cfi_restore 8
+GAS LISTING /tmp/ccrW4pFQ.s 			page 2
+
+
+  40              		.cfi_def_cfa 2, 16
+  41 0028 13010101 		addi	sp,sp,16
+  42              		.cfi_def_cfa_offset 0
+  43 002c 67800000 		jr	ra
+  44              		.cfi_endproc
+  45              	.LFE0:
+  47              		.align	2
+  48              		.globl	sem_wait
+  50              	sem_wait:
+  51              	.LFB1:
+  20:src/sem.c     **** int sem_wait (sem_t id){
+  52              		.loc 1 20 24 is_stmt 1
+  53              		.cfi_startproc
+  54              	.LVL2:
+  55 0030 130101FF 		addi	sp,sp,-16
+  56              		.cfi_def_cfa_offset 16
+  57 0034 23348100 		sd	s0,8(sp)
+  58              		.cfi_offset 8, -8
+  59 0038 13040101 		addi	s0,sp,16
+  60              		.cfi_def_cfa 8, 0
+  61 003c 93070500 		mv	a5,a0
+  21:src/sem.c     ****     int ret;
+  62              		.loc 1 21 5
+  22:src/sem.c     **** 
+  23:src/sem.c     ****     asm volatile ("li a0, 0x23\n" // Broj poziva
+  63              		.loc 1 23 5
+  64              	#APP
+  65              	# 23 "src/sem.c" 1
+  24 0044 93850700 	                  "\tmv a1, %1\n"
+  25 0048 73000000 	                  "\tecall\n"
+  26 004c 93070500 	                  "\tmv %0, a0\n" // Povratna vrednost
+  27              	            : "=r" (ret)
+  28              	            : "r" (id)
+  66              		li a0, 0x23
+  67              		mv a1, a5
+  68              		ecall
+  69              		mv a5, a0
+  70              	
+  71              	# 0 "" 2
+  72              	.LVL3:
+  29:src/sem.c     ****             : "a0", "a1");
+  30:src/sem.c     **** 
+  31:src/sem.c     ****     return ret;
+  73              		.loc 1 31 5
+  32:src/sem.c     **** }
+  74              		.loc 1 32 1 is_stmt 0
+  75              	#NO_APP
+  76 0050 1B850700 		sext.w	a0,a5
+  77 0054 03348100 		ld	s0,8(sp)
+  78              		.cfi_restore 8
+  79              		.cfi_def_cfa 2, 16
+  80 0058 13010101 		addi	sp,sp,16
+  81              		.cfi_def_cfa_offset 0
+  82 005c 67800000 		jr	ra
+  83              		.cfi_endproc
+  84              	.LFE1:
+  86              		.align	2
+GAS LISTING /tmp/ccrW4pFQ.s 			page 3
+
+
+  87              		.globl	sem_signal
+  89              	sem_signal:
+  90              	.LFB2:
+  33:src/sem.c     **** int sem_signal (sem_t id){
+  91              		.loc 1 33 26 is_stmt 1
+  92              		.cfi_startproc
+  93              	.LVL4:
+  94 0060 130101FF 		addi	sp,sp,-16
+  95              		.cfi_def_cfa_offset 16
+  96 0064 23348100 		sd	s0,8(sp)
+  97              		.cfi_offset 8, -8
+  98 0068 13040101 		addi	s0,sp,16
+  99              		.cfi_def_cfa 8, 0
+ 100 006c 93070500 		mv	a5,a0
+  34:src/sem.c     ****     int ret;
+ 101              		.loc 1 34 5
+  35:src/sem.c     **** 
+  36:src/sem.c     ****     asm volatile ("li a0, 0x24\n" // Broj poziva
+ 102              		.loc 1 36 5
+ 103              	#APP
+ 104              	# 36 "src/sem.c" 1
+  37 0074 93850700 	                  "\tmv a1, %1\n"
+  38 0078 73000000 	                  "\tecall\n"
+  39 007c 93070500 	                  "\tmv %0, a0\n" // Povratna vrednost
+  40              	            : "=r" (ret)
+  41              	            : "r" (id)
+ 105              		li a0, 0x24
+ 106              		mv a1, a5
+ 107              		ecall
+ 108              		mv a5, a0
+ 109              	
+ 110              	# 0 "" 2
+ 111              	.LVL5:
+  42:src/sem.c     ****             : "a0", "a1");
+  43:src/sem.c     **** 
+  44:src/sem.c     ****     return ret;
+ 112              		.loc 1 44 5
+  45:src/sem.c     **** }
+ 113              		.loc 1 45 1 is_stmt 0
+ 114              	#NO_APP
+ 115 0080 1B850700 		sext.w	a0,a5
+ 116 0084 03348100 		ld	s0,8(sp)
+ 117              		.cfi_restore 8
+ 118              		.cfi_def_cfa 2, 16
+ 119 0088 13010101 		addi	sp,sp,16
+ 120              		.cfi_def_cfa_offset 0
+ 121 008c 67800000 		jr	ra
+ 122              		.cfi_endproc
+ 123              	.LFE2:
+ 125              		.align	2
+ 126              		.globl	sem_open
+ 128              	sem_open:
+ 129              	.LFB3:
+  46:src/sem.c     **** int sem_open (
+  47:src/sem.c     ****         sem_t* handle,
+  48:src/sem.c     ****         unsigned init
+  49:src/sem.c     **** ){
+GAS LISTING /tmp/ccrW4pFQ.s 			page 4
+
+
+ 130              		.loc 1 49 2 is_stmt 1
+ 131              		.cfi_startproc
+ 132              	.LVL6:
+ 133 0090 130101FF 		addi	sp,sp,-16
+ 134              		.cfi_def_cfa_offset 16
+ 135 0094 23348100 		sd	s0,8(sp)
+ 136              		.cfi_offset 8, -8
+ 137 0098 13040101 		addi	s0,sp,16
+ 138              		.cfi_def_cfa 8, 0
+ 139 009c 93070500 		mv	a5,a0
+ 140 00a0 13870500 		mv	a4,a1
+  50:src/sem.c     ****     int ret;
+ 141              		.loc 1 50 5
+  51:src/sem.c     **** 
+  52:src/sem.c     ****     asm volatile ("li a0, 0x21\n" // Broj poziva
+ 142              		.loc 1 52 5
+ 143              	#APP
+ 144              	# 52 "src/sem.c" 1
+  53 00a8 93850700 	                  "\tmv a1, %1\n"
+  54 00ac 13060700 	                  "\tmv a2, %2\n"
+  55 00b0 73000000 	                  "\tecall\n"
+  56 00b4 93070500 	                  "\tmv %0, a0\n" // Povratna vrednost
+  57              	            : "=r" (ret)
+  58              	            :"r" (handle), "r" (init)
+ 145              		li a0, 0x21
+ 146              		mv a1, a5
+ 147              		mv a2, a4
+ 148              		ecall
+ 149              		mv a5, a0
+ 150              	
+ 151              	# 0 "" 2
+ 152              	.LVL7:
+  59:src/sem.c     ****             : "a0", "a1","a2");
+  60:src/sem.c     **** 
+  61:src/sem.c     ****     return ret;
+ 153              		.loc 1 61 5
+  62:src/sem.c     **** }
+ 154              		.loc 1 62 1 is_stmt 0
+ 155              	#NO_APP
+ 156 00b8 1B850700 		sext.w	a0,a5
+ 157 00bc 03348100 		ld	s0,8(sp)
+ 158              		.cfi_restore 8
+ 159              		.cfi_def_cfa 2, 16
+ 160 00c0 13010101 		addi	sp,sp,16
+ 161              		.cfi_def_cfa_offset 0
+ 162 00c4 67800000 		jr	ra
+ 163              		.cfi_endproc
+ 164              	.LFE3:
+ 166              		.align	2
+ 167              		.globl	time_sleep
+ 169              	time_sleep:
+ 170              	.LFB4:
+  63:src/sem.c     **** int time_sleep (time_t time){
+ 171              		.loc 1 63 29 is_stmt 1
+ 172              		.cfi_startproc
+ 173              	.LVL8:
+ 174 00c8 130101FF 		addi	sp,sp,-16
+GAS LISTING /tmp/ccrW4pFQ.s 			page 5
+
+
+ 175              		.cfi_def_cfa_offset 16
+ 176 00cc 23348100 		sd	s0,8(sp)
+ 177              		.cfi_offset 8, -8
+ 178 00d0 13040101 		addi	s0,sp,16
+ 179              		.cfi_def_cfa 8, 0
+ 180 00d4 93070500 		mv	a5,a0
+  64:src/sem.c     ****     int ret;
+ 181              		.loc 1 64 5
+  65:src/sem.c     **** 
+  66:src/sem.c     ****     asm volatile ("li a0, 0x31\n" // Broj poziva
+ 182              		.loc 1 66 5
+ 183              	#APP
+ 184              	# 66 "src/sem.c" 1
+  67 00dc 93850700 	                  "\tmv a1, %1\n"
+  68 00e0 73000000 	                  "\tecall\n"
+  69 00e4 93070500 	                  "\tmv %0, a0\n" // Povratna vrednost
+  70              	            : "=r" (ret)
+  71              	            :"r" (time)
+ 185              		li a0, 0x31
+ 186              		mv a1, a5
+ 187              		ecall
+ 188              		mv a5, a0
+ 189              	
+ 190              	# 0 "" 2
+ 191              	.LVL9:
+  72:src/sem.c     ****             : "a0", "a1");
+  73:src/sem.c     **** 
+  74:src/sem.c     ****     return ret;
+ 192              		.loc 1 74 5
+  75:src/sem.c     **** }...
+ 193              		.loc 1 75 1 is_stmt 0
+ 194              	#NO_APP
+ 195 00e8 1B850700 		sext.w	a0,a5
+ 196 00ec 03348100 		ld	s0,8(sp)
+ 197              		.cfi_restore 8
+ 198              		.cfi_def_cfa 2, 16
+ 199 00f0 13010101 		addi	sp,sp,16
+ 200              		.cfi_def_cfa_offset 0
+ 201 00f4 67800000 		jr	ra
+ 202              		.cfi_endproc
+ 203              	.LFE4:
+ 205              	.Letext0:
+ 206              		.file 2 "src/../h/../lib/hw.h"
+ 207              		.file 3 "src/../h/syscall_c.h"
+GAS LISTING /tmp/ccrW4pFQ.s 			page 6
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 sem.c
+     /tmp/ccrW4pFQ.s:10     .text:0000000000000000 sem_close
+     /tmp/ccrW4pFQ.s:14     .text:0000000000000000 .L0 
+     /tmp/ccrW4pFQ.s:16     .text:0000000000000000 .L0 
+     /tmp/ccrW4pFQ.s:17     .text:0000000000000004 .L0 
+     /tmp/ccrW4pFQ.s:19     .text:0000000000000008 .L0 
+     /tmp/ccrW4pFQ.s:21     .text:000000000000000c .L0 
+     /tmp/ccrW4pFQ.s:24     .text:0000000000000010 .L0 
+           src/sem.c:9      .text:0000000000000010 .L0 
+     /tmp/ccrW4pFQ.s:35     .text:0000000000000020 .L0 
+     /tmp/ccrW4pFQ.s:37     .text:0000000000000020 .L0 
+     /tmp/ccrW4pFQ.s:39     .text:0000000000000028 .L0 
+     /tmp/ccrW4pFQ.s:40     .text:0000000000000028 .L0 
+     /tmp/ccrW4pFQ.s:42     .text:000000000000002c .L0 
+     /tmp/ccrW4pFQ.s:44     .text:0000000000000030 .L0 
+     /tmp/ccrW4pFQ.s:50     .text:0000000000000030 sem_wait
+     /tmp/ccrW4pFQ.s:53     .text:0000000000000030 .L0 
+     /tmp/ccrW4pFQ.s:55     .text:0000000000000030 .L0 
+     /tmp/ccrW4pFQ.s:56     .text:0000000000000034 .L0 
+     /tmp/ccrW4pFQ.s:58     .text:0000000000000038 .L0 
+     /tmp/ccrW4pFQ.s:60     .text:000000000000003c .L0 
+     /tmp/ccrW4pFQ.s:63     .text:0000000000000040 .L0 
+           src/sem.c:23     .text:0000000000000040 .L0 
+     /tmp/ccrW4pFQ.s:74     .text:0000000000000050 .L0 
+     /tmp/ccrW4pFQ.s:76     .text:0000000000000050 .L0 
+     /tmp/ccrW4pFQ.s:78     .text:0000000000000058 .L0 
+     /tmp/ccrW4pFQ.s:79     .text:0000000000000058 .L0 
+     /tmp/ccrW4pFQ.s:81     .text:000000000000005c .L0 
+     /tmp/ccrW4pFQ.s:83     .text:0000000000000060 .L0 
+     /tmp/ccrW4pFQ.s:89     .text:0000000000000060 sem_signal
+     /tmp/ccrW4pFQ.s:92     .text:0000000000000060 .L0 
+     /tmp/ccrW4pFQ.s:94     .text:0000000000000060 .L0 
+     /tmp/ccrW4pFQ.s:95     .text:0000000000000064 .L0 
+     /tmp/ccrW4pFQ.s:97     .text:0000000000000068 .L0 
+     /tmp/ccrW4pFQ.s:99     .text:000000000000006c .L0 
+     /tmp/ccrW4pFQ.s:102    .text:0000000000000070 .L0 
+           src/sem.c:36     .text:0000000000000070 .L0 
+     /tmp/ccrW4pFQ.s:113    .text:0000000000000080 .L0 
+     /tmp/ccrW4pFQ.s:115    .text:0000000000000080 .L0 
+     /tmp/ccrW4pFQ.s:117    .text:0000000000000088 .L0 
+     /tmp/ccrW4pFQ.s:118    .text:0000000000000088 .L0 
+     /tmp/ccrW4pFQ.s:120    .text:000000000000008c .L0 
+     /tmp/ccrW4pFQ.s:122    .text:0000000000000090 .L0 
+     /tmp/ccrW4pFQ.s:128    .text:0000000000000090 sem_open
+     /tmp/ccrW4pFQ.s:131    .text:0000000000000090 .L0 
+     /tmp/ccrW4pFQ.s:133    .text:0000000000000090 .L0 
+     /tmp/ccrW4pFQ.s:134    .text:0000000000000094 .L0 
+     /tmp/ccrW4pFQ.s:136    .text:0000000000000098 .L0 
+     /tmp/ccrW4pFQ.s:138    .text:000000000000009c .L0 
+     /tmp/ccrW4pFQ.s:142    .text:00000000000000a4 .L0 
+           src/sem.c:52     .text:00000000000000a4 .L0 
+     /tmp/ccrW4pFQ.s:154    .text:00000000000000b8 .L0 
+     /tmp/ccrW4pFQ.s:156    .text:00000000000000b8 .L0 
+     /tmp/ccrW4pFQ.s:158    .text:00000000000000c0 .L0 
+     /tmp/ccrW4pFQ.s:159    .text:00000000000000c0 .L0 
+     /tmp/ccrW4pFQ.s:161    .text:00000000000000c4 .L0 
+GAS LISTING /tmp/ccrW4pFQ.s 			page 7
+
+
+     /tmp/ccrW4pFQ.s:163    .text:00000000000000c8 .L0 
+     /tmp/ccrW4pFQ.s:169    .text:00000000000000c8 time_sleep
+     /tmp/ccrW4pFQ.s:172    .text:00000000000000c8 .L0 
+     /tmp/ccrW4pFQ.s:174    .text:00000000000000c8 .L0 
+     /tmp/ccrW4pFQ.s:175    .text:00000000000000cc .L0 
+     /tmp/ccrW4pFQ.s:177    .text:00000000000000d0 .L0 
+     /tmp/ccrW4pFQ.s:179    .text:00000000000000d4 .L0 
+     /tmp/ccrW4pFQ.s:182    .text:00000000000000d8 .L0 
+           src/sem.c:66     .text:00000000000000d8 .L0 
+     /tmp/ccrW4pFQ.s:193    .text:00000000000000e8 .L0 
+     /tmp/ccrW4pFQ.s:195    .text:00000000000000e8 .L0 
+     /tmp/ccrW4pFQ.s:197    .text:00000000000000f0 .L0 
+     /tmp/ccrW4pFQ.s:198    .text:00000000000000f0 .L0 
+     /tmp/ccrW4pFQ.s:200    .text:00000000000000f4 .L0 
+     /tmp/ccrW4pFQ.s:202    .text:00000000000000f8 .L0 
+     /tmp/ccrW4pFQ.s:208    .text:00000000000000f8 .L0 
+                     .debug_frame:0000000000000000 .L0 
+     /tmp/ccrW4pFQ.s:745    .debug_abbrev:0000000000000000 .Ldebug_abbrev0
+     /tmp/ccrW4pFQ.s:1251   .debug_str:000000000000015d .LASF52
+     /tmp/ccrW4pFQ.s:1279   .debug_str:0000000000000283 .LASF53
+     /tmp/ccrW4pFQ.s:1249   .debug_str:0000000000000132 .LASF54
+     /tmp/ccrW4pFQ.s:5      .text:0000000000000000 .Ltext0
+     /tmp/ccrW4pFQ.s:205    .text:00000000000000f8 .Letext0
+     /tmp/ccrW4pFQ.s:1187   .debug_line:0000000000000000 .Ldebug_line0
+     /tmp/ccrW4pFQ.s:1253   .debug_str:00000000000001fb .LASF0
+     /tmp/ccrW4pFQ.s:1231   .debug_str:00000000000000d6 .LASF1
+     /tmp/ccrW4pFQ.s:1223   .debug_str:00000000000000a6 .LASF2
+     /tmp/ccrW4pFQ.s:1205   .debug_str:0000000000000049 .LASF4
+     /tmp/ccrW4pFQ.s:1229   .debug_str:00000000000000c4 .LASF3
+     /tmp/ccrW4pFQ.s:1191   .debug_str:0000000000000013 .LASF5
+     /tmp/ccrW4pFQ.s:1257   .debug_str:0000000000000213 .LASF6
+     /tmp/ccrW4pFQ.s:1189   .debug_str:0000000000000000 .LASF7
+     /tmp/ccrW4pFQ.s:1217   .debug_str:000000000000007f .LASF8
+     /tmp/ccrW4pFQ.s:1261   .debug_str:000000000000021f .LASF9
+     /tmp/ccrW4pFQ.s:1201   .debug_str:0000000000000034 .LASF10
+     /tmp/ccrW4pFQ.s:1299   .debug_str:00000000000002dc .LASF11
+     /tmp/ccrW4pFQ.s:1221   .debug_str:0000000000000097 .LASF12
+     /tmp/ccrW4pFQ.s:1291   .debug_str:00000000000002b6 .LASF13
+     /tmp/ccrW4pFQ.s:1271   .debug_str:000000000000025b .LASF14
+     /tmp/ccrW4pFQ.s:1233   .debug_str:00000000000000e9 .LASF15
+     /tmp/ccrW4pFQ.s:1211   .debug_str:000000000000005b .LASF16
+     /tmp/ccrW4pFQ.s:1265   .debug_str:0000000000000234 .LASF17
+     /tmp/ccrW4pFQ.s:1239   .debug_str:0000000000000106 .LASF18
+     /tmp/ccrW4pFQ.s:1281   .debug_str:000000000000028d .LASF26
+     /tmp/ccrW4pFQ.s:1277   .debug_str:000000000000027b .LASF19
+     /tmp/ccrW4pFQ.s:1225   .debug_str:00000000000000b4 .LASF20
+     /tmp/ccrW4pFQ.s:1293   .debug_str:00000000000002c6 .LASF21
+     /tmp/ccrW4pFQ.s:1297   .debug_str:00000000000002d4 .LASF22
+     /tmp/ccrW4pFQ.s:1197   .debug_str:0000000000000026 .LASF23
+     /tmp/ccrW4pFQ.s:1259   .debug_str:000000000000021a .LASF24
+     /tmp/ccrW4pFQ.s:1237   .debug_str:00000000000000fc .LASF25
+     /tmp/ccrW4pFQ.s:1283   .debug_str:000000000000029a .LASF27
+     /tmp/ccrW4pFQ.s:1269   .debug_str:0000000000000253 .LASF28
+     /tmp/ccrW4pFQ.s:1207   .debug_str:0000000000000050 .LASF29
+     /tmp/ccrW4pFQ.s:1193   .debug_str:000000000000001a .LASF30
+     /tmp/ccrW4pFQ.s:1241   .debug_str:000000000000010b .LASF31
+     /tmp/ccrW4pFQ.s:1275   .debug_str:0000000000000271 .LASF32
+GAS LISTING /tmp/ccrW4pFQ.s 			page 8
+
+
+     /tmp/ccrW4pFQ.s:1203   .debug_str:0000000000000042 .LASF33
+     /tmp/ccrW4pFQ.s:1295   .debug_str:00000000000002ce .LASF34
+     /tmp/ccrW4pFQ.s:1289   .debug_str:00000000000002b0 .LASF35
+     /tmp/ccrW4pFQ.s:1267   .debug_str:000000000000024a .LASF36
+     /tmp/ccrW4pFQ.s:1273   .debug_str:000000000000026b .LASF37
+     /tmp/ccrW4pFQ.s:1219   .debug_str:0000000000000092 .LASF38
+     /tmp/ccrW4pFQ.s:1263   .debug_str:000000000000022f .LASF39
+     /tmp/ccrW4pFQ.s:1285   .debug_str:00000000000002a2 .LASF40
+     /tmp/ccrW4pFQ.s:1243   .debug_str:0000000000000119 .LASF41
+     /tmp/ccrW4pFQ.s:1199   .debug_str:000000000000002e .LASF42
+     /tmp/ccrW4pFQ.s:1213   .debug_str:0000000000000071 .LASF43
+     /tmp/ccrW4pFQ.s:1215   .debug_str:0000000000000079 .LASF44
+     /tmp/ccrW4pFQ.s:1195   .debug_str:0000000000000020 .LASF45
+     /tmp/ccrW4pFQ.s:1255   .debug_str:0000000000000208 .LASF46
+     /tmp/ccrW4pFQ.s:170    .text:00000000000000c8 .LFB4
+     /tmp/ccrW4pFQ.s:203    .text:00000000000000f8 .LFE4
+     /tmp/ccrW4pFQ.s:1090   .debug_loc:0000000000000000 .LLST5
+     /tmp/ccrW4pFQ.s:1287   .debug_str:00000000000002a7 .LASF47
+     /tmp/ccrW4pFQ.s:129    .text:0000000000000090 .LFB3
+     /tmp/ccrW4pFQ.s:164    .text:00000000000000c8 .LFE3
+     /tmp/ccrW4pFQ.s:1235   .debug_str:00000000000000f5 .LASF48
+     /tmp/ccrW4pFQ.s:1104   .debug_loc:0000000000000039 .LLST3
+     /tmp/ccrW4pFQ.s:1209   .debug_str:0000000000000056 .LASF49
+     /tmp/ccrW4pFQ.s:1118   .debug_loc:0000000000000072 .LLST4
+     /tmp/ccrW4pFQ.s:1247   .debug_str:0000000000000127 .LASF50
+     /tmp/ccrW4pFQ.s:90     .text:0000000000000060 .LFB2
+     /tmp/ccrW4pFQ.s:123    .text:0000000000000090 .LFE2
+     /tmp/ccrW4pFQ.s:1132   .debug_loc:00000000000000ab .LLST2
+     /tmp/ccrW4pFQ.s:1245   .debug_str:000000000000011e .LASF51
+     /tmp/ccrW4pFQ.s:51     .text:0000000000000030 .LFB1
+     /tmp/ccrW4pFQ.s:84     .text:0000000000000060 .LFE1
+     /tmp/ccrW4pFQ.s:1146   .debug_loc:00000000000000e4 .LLST1
+     /tmp/ccrW4pFQ.s:1227   .debug_str:00000000000000ba .LASF55
+     /tmp/ccrW4pFQ.s:11     .text:0000000000000000 .LFB0
+     /tmp/ccrW4pFQ.s:45     .text:0000000000000030 .LFE0
+     /tmp/ccrW4pFQ.s:1160   .debug_loc:000000000000011d .LLST0
+     /tmp/ccrW4pFQ.s:173    .text:00000000000000c8 .LVL8
+     /tmp/ccrW4pFQ.s:191    .text:00000000000000e8 .LVL9
+     /tmp/ccrW4pFQ.s:132    .text:0000000000000090 .LVL6
+     /tmp/ccrW4pFQ.s:152    .text:00000000000000b8 .LVL7
+     /tmp/ccrW4pFQ.s:93     .text:0000000000000060 .LVL4
+     /tmp/ccrW4pFQ.s:111    .text:0000000000000080 .LVL5
+     /tmp/ccrW4pFQ.s:54     .text:0000000000000030 .LVL2
+     /tmp/ccrW4pFQ.s:72     .text:0000000000000050 .LVL3
+     /tmp/ccrW4pFQ.s:15     .text:0000000000000000 .LVL0
+     /tmp/ccrW4pFQ.s:33     .text:0000000000000020 .LVL1
+     /tmp/ccrW4pFQ.s:209    .debug_info:0000000000000000 .Ldebug_info0
+
+NO UNDEFINED SYMBOLS

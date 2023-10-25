@@ -1,0 +1,283 @@
+GAS LISTING /tmp/cctTALjz.s 			page 1
+
+
+   1              		.file	"thread.c"
+   2              		.option nopic
+   3              		.option norelax
+   4              		.text
+   5              	.Ltext0:
+   6              		.cfi_sections	.debug_frame
+   7              		.align	2
+   8              		.globl	thread_dispatch
+  10              	thread_dispatch:
+  11              	.LFB0:
+  12              		.file 1 "src/thread.c"
+   1:src/thread.c  **** //
+   2:src/thread.c  **** // Created by os on 7/27/22.
+   3:src/thread.c  **** //
+   4:src/thread.c  **** //#include "../h/kernel.h"
+   5:src/thread.c  **** #include "../h/syscall_c.h"
+   6:src/thread.c  **** #include "../lib/hw.h"
+   7:src/thread.c  **** 
+   8:src/thread.c  **** 
+   9:src/thread.c  **** void thread_dispatch (){
+  13              		.loc 1 9 24
+  14              		.cfi_startproc
+  15 0000 130101FF 		addi	sp,sp,-16
+  16              		.cfi_def_cfa_offset 16
+  17 0004 23348100 		sd	s0,8(sp)
+  18              		.cfi_offset 8, -8
+  19 0008 13040101 		addi	s0,sp,16
+  20              		.cfi_def_cfa 8, 0
+  10:src/thread.c  ****     asm volatile ("li a0, 0x13\n" // Broj poziva
+  21              		.loc 1 10 5
+  22              	#APP
+  23              	# 10 "src/thread.c" 1
+  11 0010 73000000 	                  "\tecall\n");
+  12              	}
+  13              	int thread_create(thread_t* handle,
+  12:src/thread.c  **** int thread_create(thread_t* handle,
+  24              		li a0, 0x13
+  25              		ecall
+  26              	
+  27              	# 0 "" 2
+  28              		.loc 1 12 1 is_stmt 0
+  29              	#NO_APP
+  30 0014 03348100 		ld	s0,8(sp)
+  31              		.cfi_restore 8
+  32              		.cfi_def_cfa 2, 16
+  33 0018 13010101 		addi	sp,sp,16
+  34              		.cfi_def_cfa_offset 0
+  35 001c 67800000 		jr	ra
+  36              		.cfi_endproc
+  37              	.LFE0:
+  39              		.align	2
+  40              		.globl	thread_create
+  42              	thread_create:
+  43              	.LFB1:
+  14:src/thread.c  ****                   void(*start_routine)(void*),
+  15:src/thread.c  ****                   void* arg) {
+  44              		.loc 1 15 30 is_stmt 1
+GAS LISTING /tmp/cctTALjz.s 			page 2
+
+
+  45              		.cfi_startproc
+  46              	.LVL0:
+  47 0020 130101FF 		addi	sp,sp,-16
+  48              		.cfi_def_cfa_offset 16
+  49 0024 23348100 		sd	s0,8(sp)
+  50              		.cfi_offset 8, -8
+  51 0028 13040101 		addi	s0,sp,16
+  52              		.cfi_def_cfa 8, 0
+  53 002c 93070500 		mv	a5,a0
+  54 0030 13870500 		mv	a4,a1
+  55 0034 13080600 		mv	a6,a2
+  16:src/thread.c  ****     void *ret=(void*)0;
+  56              		.loc 1 16 5
+  57              	.LVL1:
+  17:src/thread.c  **** 
+  18:src/thread.c  ****     asm volatile ("li a0, 0x11\n" // Broj poziva
+  58              		.loc 1 18 5
+  59              	#APP
+  60              	# 18 "src/thread.c" 1
+  19 003c 93850700 	                  "\tmv a1, %1\n"
+  20 0040 13060700 	                  "\tmv a2, %2\n"
+  21 0044 93060800 	                  "\tmv a3, %3\n"
+  22 0048 73000000 	                  "\tecall\n"
+  23 004c 93070500 	                  "\tmv %0, a0\n" // Povratna vrednost
+  24              	            : "=r" (ret)
+  25              	            : "r" (handle)
+  61              		li a0, 0x11
+  62              		mv a1, a5
+  63              		mv a2, a4
+  64              		mv a3, a6
+  65              		ecall
+  66              		mv a5, a0
+  67              	
+  68              	# 0 "" 2
+  69              	.LVL2:
+  26:src/thread.c  ****     , "r" (start_routine)
+  27:src/thread.c  ****     , "r" (arg)
+  28:src/thread.c  ****             : "a0", "a1","a2","a3");
+  29:src/thread.c  **** 
+  30:src/thread.c  ****     return (uint64)ret;
+  70              		.loc 1 30 5
+  31:src/thread.c  **** }
+  71              		.loc 1 31 1 is_stmt 0
+  72              	#NO_APP
+  73 0050 1B850700 		sext.w	a0,a5
+  74 0054 03348100 		ld	s0,8(sp)
+  75              		.cfi_restore 8
+  76              		.cfi_def_cfa 2, 16
+  77 0058 13010101 		addi	sp,sp,16
+  78              		.cfi_def_cfa_offset 0
+  79 005c 67800000 		jr	ra
+  80              		.cfi_endproc
+  81              	.LFE1:
+  83              		.align	2
+  84              		.globl	thread_exit
+  86              	thread_exit:
+  87              	.LFB2:
+GAS LISTING /tmp/cctTALjz.s 			page 3
+
+
+  32:src/thread.c  **** int thread_exit (){
+  88              		.loc 1 32 19 is_stmt 1
+  89              		.cfi_startproc
+  90 0060 130101FF 		addi	sp,sp,-16
+  91              		.cfi_def_cfa_offset 16
+  92 0064 23348100 		sd	s0,8(sp)
+  93              		.cfi_offset 8, -8
+  94 0068 13040101 		addi	s0,sp,16
+  95              		.cfi_def_cfa 8, 0
+  33:src/thread.c  **** 
+  34:src/thread.c  ****     int ret;
+  96              		.loc 1 34 5
+  35:src/thread.c  **** 
+  36:src/thread.c  ****     asm volatile ("li a0, 0x12\n" // Broj poziva
+  97              		.loc 1 36 5
+  98              	#APP
+  99              	# 36 "src/thread.c" 1
+  37 0070 73000000 	                  "\tecall\n"
+  38 0074 93070500 	                  "\tmv %0, a0\n" // Povratna vrednost
+  39              	            :"=r" (ret)
+  40              	            :
+ 100              		li a0, 0x12
+ 101              		ecall
+ 102              		mv a5, a0
+ 103              	
+ 104              	# 0 "" 2
+ 105              	.LVL3:
+  41:src/thread.c  ****             : "a0");
+  42:src/thread.c  **** 
+  43:src/thread.c  ****     return ret;
+ 106              		.loc 1 43 5
+  44:src/thread.c  **** }...
+ 107              		.loc 1 44 1 is_stmt 0
+ 108              	#NO_APP
+ 109 0078 1B850700 		sext.w	a0,a5
+ 110 007c 03348100 		ld	s0,8(sp)
+ 111              		.cfi_restore 8
+ 112              		.cfi_def_cfa 2, 16
+ 113 0080 13010101 		addi	sp,sp,16
+ 114              		.cfi_def_cfa_offset 0
+ 115 0084 67800000 		jr	ra
+ 116              		.cfi_endproc
+ 117              	.LFE2:
+ 119              	.Letext0:
+ 120              		.file 2 "src/../h/../lib/hw.h"
+ 121              		.file 3 "src/../h/syscall_c.h"
+GAS LISTING /tmp/cctTALjz.s 			page 4
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 thread.c
+     /tmp/cctTALjz.s:10     .text:0000000000000000 thread_dispatch
+     /tmp/cctTALjz.s:14     .text:0000000000000000 .L0 
+     /tmp/cctTALjz.s:15     .text:0000000000000000 .L0 
+     /tmp/cctTALjz.s:16     .text:0000000000000004 .L0 
+     /tmp/cctTALjz.s:18     .text:0000000000000008 .L0 
+     /tmp/cctTALjz.s:20     .text:000000000000000c .L0 
+        src/thread.c:10     .text:000000000000000c .L0 
+     /tmp/cctTALjz.s:30     .text:0000000000000014 .L0 
+     /tmp/cctTALjz.s:31     .text:0000000000000018 .L0 
+     /tmp/cctTALjz.s:32     .text:0000000000000018 .L0 
+     /tmp/cctTALjz.s:34     .text:000000000000001c .L0 
+     /tmp/cctTALjz.s:36     .text:0000000000000020 .L0 
+     /tmp/cctTALjz.s:42     .text:0000000000000020 thread_create
+     /tmp/cctTALjz.s:45     .text:0000000000000020 .L0 
+     /tmp/cctTALjz.s:47     .text:0000000000000020 .L0 
+     /tmp/cctTALjz.s:48     .text:0000000000000024 .L0 
+     /tmp/cctTALjz.s:50     .text:0000000000000028 .L0 
+     /tmp/cctTALjz.s:52     .text:000000000000002c .L0 
+     /tmp/cctTALjz.s:58     .text:0000000000000038 .L0 
+        src/thread.c:18     .text:0000000000000038 .L0 
+     /tmp/cctTALjz.s:71     .text:0000000000000050 .L0 
+     /tmp/cctTALjz.s:73     .text:0000000000000050 .L0 
+     /tmp/cctTALjz.s:75     .text:0000000000000058 .L0 
+     /tmp/cctTALjz.s:76     .text:0000000000000058 .L0 
+     /tmp/cctTALjz.s:78     .text:000000000000005c .L0 
+     /tmp/cctTALjz.s:80     .text:0000000000000060 .L0 
+     /tmp/cctTALjz.s:86     .text:0000000000000060 thread_exit
+     /tmp/cctTALjz.s:89     .text:0000000000000060 .L0 
+     /tmp/cctTALjz.s:90     .text:0000000000000060 .L0 
+     /tmp/cctTALjz.s:91     .text:0000000000000064 .L0 
+     /tmp/cctTALjz.s:93     .text:0000000000000068 .L0 
+     /tmp/cctTALjz.s:95     .text:000000000000006c .L0 
+     /tmp/cctTALjz.s:97     .text:000000000000006c .L0 
+        src/thread.c:36     .text:000000000000006c .L0 
+     /tmp/cctTALjz.s:107    .text:0000000000000078 .L0 
+     /tmp/cctTALjz.s:109    .text:0000000000000078 .L0 
+     /tmp/cctTALjz.s:111    .text:0000000000000080 .L0 
+     /tmp/cctTALjz.s:112    .text:0000000000000080 .L0 
+     /tmp/cctTALjz.s:114    .text:0000000000000084 .L0 
+     /tmp/cctTALjz.s:116    .text:0000000000000088 .L0 
+     /tmp/cctTALjz.s:122    .text:0000000000000088 .L0 
+                     .debug_frame:0000000000000000 .L0 
+     /tmp/cctTALjz.s:502    .debug_abbrev:0000000000000000 .Ldebug_abbrev0
+     /tmp/cctTALjz.s:996    .debug_str:0000000000000130 .LASF38
+     /tmp/cctTALjz.s:1022   .debug_str:0000000000000258 .LASF39
+     /tmp/cctTALjz.s:994    .debug_str:0000000000000105 .LASF40
+     /tmp/cctTALjz.s:5      .text:0000000000000000 .Ltext0
+     /tmp/cctTALjz.s:119    .text:0000000000000088 .Letext0
+     /tmp/cctTALjz.s:948    .debug_line:0000000000000000 .Ldebug_line0
+     /tmp/cctTALjz.s:998    .debug_str:00000000000001ce .LASF0
+     /tmp/cctTALjz.s:980    .debug_str:00000000000000b4 .LASF1
+     /tmp/cctTALjz.s:974    .debug_str:000000000000008e .LASF2
+     /tmp/cctTALjz.s:964    .debug_str:0000000000000049 .LASF4
+     /tmp/cctTALjz.s:978    .debug_str:00000000000000a2 .LASF3
+     /tmp/cctTALjz.s:952    .debug_str:0000000000000013 .LASF5
+GAS LISTING /tmp/cctTALjz.s 			page 5
+
+
+     /tmp/cctTALjz.s:1000   .debug_str:00000000000001db .LASF6
+     /tmp/cctTALjz.s:950    .debug_str:0000000000000000 .LASF7
+     /tmp/cctTALjz.s:970    .debug_str:000000000000006c .LASF8
+     /tmp/cctTALjz.s:1004   .debug_str:00000000000001e7 .LASF9
+     /tmp/cctTALjz.s:960    .debug_str:0000000000000034 .LASF10
+     /tmp/cctTALjz.s:1036   .debug_str:000000000000029e .LASF11
+     /tmp/cctTALjz.s:972    .debug_str:000000000000007f .LASF12
+     /tmp/cctTALjz.s:1030   .debug_str:0000000000000280 .LASF13
+     /tmp/cctTALjz.s:1012   .debug_str:000000000000021e .LASF14
+     /tmp/cctTALjz.s:984    .debug_str:00000000000000d5 .LASF15
+     /tmp/cctTALjz.s:968    .debug_str:0000000000000056 .LASF16
+     /tmp/cctTALjz.s:1006   .debug_str:00000000000001f7 .LASF17
+     /tmp/cctTALjz.s:990    .debug_str:00000000000000f2 .LASF18
+     /tmp/cctTALjz.s:1024   .debug_str:0000000000000265 .LASF26
+     /tmp/cctTALjz.s:1018   .debug_str:0000000000000248 .LASF19
+     /tmp/cctTALjz.s:976    .debug_str:000000000000009c .LASF20
+     /tmp/cctTALjz.s:1032   .debug_str:0000000000000290 .LASF21
+     /tmp/cctTALjz.s:1020   .debug_str:0000000000000250 .LASF22
+     /tmp/cctTALjz.s:958    .debug_str:000000000000002c .LASF23
+     /tmp/cctTALjz.s:1002   .debug_str:00000000000001e2 .LASF24
+     /tmp/cctTALjz.s:988    .debug_str:00000000000000e8 .LASF25
+     /tmp/cctTALjz.s:1026   .debug_str:0000000000000272 .LASF27
+     /tmp/cctTALjz.s:1010   .debug_str:0000000000000216 .LASF28
+     /tmp/cctTALjz.s:966    .debug_str:0000000000000050 .LASF29
+     /tmp/cctTALjz.s:954    .debug_str:000000000000001a .LASF30
+     /tmp/cctTALjz.s:992    .debug_str:00000000000000f7 .LASF31
+     /tmp/cctTALjz.s:1014   .debug_str:000000000000022e .LASF32
+     /tmp/cctTALjz.s:962    .debug_str:0000000000000042 .LASF33
+     /tmp/cctTALjz.s:1034   .debug_str:0000000000000298 .LASF34
+     /tmp/cctTALjz.s:1028   .debug_str:000000000000027a .LASF35
+     /tmp/cctTALjz.s:1008   .debug_str:000000000000020d .LASF36
+     /tmp/cctTALjz.s:956    .debug_str:0000000000000020 .LASF41
+     /tmp/cctTALjz.s:87     .text:0000000000000060 .LFB2
+     /tmp/cctTALjz.s:117    .text:0000000000000088 .LFE2
+     /tmp/cctTALjz.s:982    .debug_str:00000000000000c7 .LASF42
+     /tmp/cctTALjz.s:43     .text:0000000000000020 .LFB1
+     /tmp/cctTALjz.s:81     .text:0000000000000060 .LFE1
+     /tmp/cctTALjz.s:986    .debug_str:00000000000000e1 .LASF37
+     /tmp/cctTALjz.s:887    .debug_loc:0000000000000000 .LLST0
+     /tmp/cctTALjz.s:901    .debug_loc:0000000000000039 .LLST1
+     /tmp/cctTALjz.s:912    .debug_loc:000000000000006f .LLST2
+     /tmp/cctTALjz.s:923    .debug_loc:00000000000000a5 .LLST3
+     /tmp/cctTALjz.s:1016   .debug_str:0000000000000238 .LASF43
+     /tmp/cctTALjz.s:11     .text:0000000000000000 .LFB0
+     /tmp/cctTALjz.s:37     .text:0000000000000020 .LFE0
+     /tmp/cctTALjz.s:46     .text:0000000000000020 .LVL0
+     /tmp/cctTALjz.s:69     .text:0000000000000050 .LVL2
+     /tmp/cctTALjz.s:57     .text:0000000000000038 .LVL1
+     /tmp/cctTALjz.s:123    .debug_info:0000000000000000 .Ldebug_info0
+
+NO UNDEFINED SYMBOLS
